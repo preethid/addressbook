@@ -1,40 +1,40 @@
-pipeline {
+
+def gv
+pipeline{
     agent any
-
-    tools {
-        // Install the Maven version configured as "M3" and add it to the path.
-        maven "mymaven"
-        jdk "myjava"
+    tools{
+        maven 'mymaven'
     }
+    stages{
+        stage("init"){
+            steps{
+                script{
+                    gv = load "script.groovy"
+                }
+            }
+        }
+        stage("build war"){
+            steps{
+                script{
+                    gv.buildwar()
+                }
+            }
+        }
+        stage("build image"){
+            steps{
+                script{
+                    gv.buildImage()
 
-    stages {
-        stage('Compile') {
-            steps {
-                // Get some code from a GitHub repository
-                git 'https://github.com/devops-trainer/addressbook.git'
+                }
+            }
+        }
+        stage("deploy"){
+            steps{
+                script{
+                    gv.deployApp()
+                }
+            }
+        }
 
-               sh "mvn compile"
-            }
-        }
-        stage('CodeReview') {
-            steps {
-              sh "mvn pmd:pmd"
-            }
-        }
-        stage('UnitTest') {
-            steps {
-               sh "mvn test"
-            }
-        }
-        stage('MetricCheck') {
-            steps {
-              sh "mvn cobertura:cobertura -Dcobertura.report.format=xml"
-            }
-        }
-        stage('Package') {
-            steps {
-                sh "mvn package"
-            }
-        }
     }
 }
