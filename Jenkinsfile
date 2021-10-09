@@ -1,4 +1,3 @@
-def gv
 pipeline{
     agent any
     tools{
@@ -6,45 +5,46 @@ pipeline{
         maven 'mymaven'
     }
     stages{
-        stage("init"){
-            steps{
-                script{
-                    gv = load "script.groovy"
-                }
-            }
-        }
         stage("COMPILE"){
             steps{
                 script{
-                 gv.compilecode()
+                 echo "compiling the code"
+   sh 'mvn compile'
             }
            }
         }
         stage("UNITTEST"){
             steps{
                 script{
-                 gv.testapp()
+                   echo "testing the app"
+   sh 'mvn test'
             }
          }
         }
         stage("BUILDING"){
             steps{
                 script{
-                  gv.buildapp()
+                  echo "building the app"
+   sh 'mvn package'
                 }
             }
         }
         stage("BUILD THE DOCKER IMAGE"){
             steps{
                 script{
-              gv.builddockerimage()
+              echo "building the docker image" 
+               withCredentials([usernamePassword(credentialsId: 'docker-hub', 
+                    passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                   sh 'sudo docker build -t devopstrainer/myrepoprivate:$BUILD_NUMBER .'
+                   sh "sudo docker login -u $USER -p $PASS"
+                   sh 'sudo docker push devopstrainer/myrepoprivate:$BUILD_NUMBER'
                }
                 }
             }
          stage("DEPLOY"){
             steps{
                 script{
-               gv.deployApp()
+                echo "building the app"
                 }
             }
         }
