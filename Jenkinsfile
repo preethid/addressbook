@@ -1,6 +1,7 @@
 pipeline{
     agent any
-       tools{
+ 
+    tools{
         jdk 'myjava'
         maven 'mymaven'
     }
@@ -15,7 +16,7 @@ pipeline{
 }
         }
         stage("UNITTEST"){
-             steps{
+            steps{
                script{
               echo  "testing the app"
               sh 'mvn test'
@@ -23,6 +24,11 @@ pipeline{
 }
         }
         stage("BUILDING"){
+            when{
+                expression{//this variable avaible only on mutli branch pipeline jobs
+                    BRANCH_NAME == 'master'
+                }
+            }
             steps{
           script{
                echo "building the app"
@@ -31,6 +37,11 @@ pipeline{
 }
         }
         stage("BUILD THE DOCKER IMAGE"){
+             when{
+                expression{//this variable avaible only on mutli branch pipeline jobs
+                    BRANCH_NAME == 'master'
+                }
+            }
             steps{
              script{
                echo "building the docker image"
@@ -44,6 +55,11 @@ pipeline{
           }
         }
         stage("DEPLOY"){
+             when{
+                expression{//this variable avaible only on mutli branch pipeline jobs
+                    BRANCH_NAME == 'master'
+                }
+            }
             steps{
            script{
                echo "deploying the app"
