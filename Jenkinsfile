@@ -1,70 +1,52 @@
+def gv
 pipeline{
     agent any
- 
     tools{
         jdk 'myjava'
         maven 'mymaven'
     }
     stages{
+        stage("init"){
+            steps{
+                script{
+                    gv = load "script.groovy"
+                }
+            }
+        }
         stage("COMPILE"){
             steps{
-               script{
-                echo "compiling the code"
-                git 'https://github.com/preethid/addressbook.git'
-                sh 'mvn compile'
+                script{
+                 gv.compilecode()
             }
-}
+           }
         }
         stage("UNITTEST"){
             steps{
-               script{
-              echo  "testing the app"
-              sh 'mvn test'
+                script{
+                 gv.testapp()
             }
-}
+         }
         }
         stage("BUILDING"){
-            when{
-                expression{//this variable avaible only on mutli branch pipeline jobs
-                    BRANCH_NAME == 'master'
+            steps{
+                script{
+                  gv.buildapp()
                 }
             }
-            steps{
-          script{
-               echo "building the app"
-               sh 'mvn package'
-            }
-}
         }
         stage("BUILD THE DOCKER IMAGE"){
-             when{
-                expression{//this variable avaible only on mutli branch pipeline jobs
-                    BRANCH_NAME == 'master'
-                }
-            }
             steps{
-             script{
-               echo "building the docker image"
-               withCredentials([usernamePassword(credentialsId: 'docker-hub',
-                    passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                   sh 'sudo docker build -t devopstrainer/myrepoprivate:$BUILD_NUMBER .'
-                   sh 'sudo docker login -u $USER -p $PASS'
-                   sh 'sudo docker push devopstrainer/myrepoprivate:$BUILD_NUMBER'
+                script{
+              gv.builddockerimage()
                }
-            }
-          }
-        }
-        stage("DEPLOY"){
-             when{
-                expression{//this variable avaible only on mutli branch pipeline jobs
-                    BRANCH_NAME == 'master'
                 }
             }
+         stage("DEPLOY"){
             steps{
-           script{
-               echo "deploying the app"
+                script{
+               gv.deployApp()
+                }
             }
         }
-     }
     }
 }
