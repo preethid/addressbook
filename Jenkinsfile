@@ -1,7 +1,8 @@
 def gv
- gv = load ('script.groovy')
+
 pipeline{
     agent any
+  gv = load ('script.groovy')
     tools{
         jdk 'myjava'
         maven 'mymaven'
