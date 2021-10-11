@@ -1,3 +1,4 @@
+#!/usr/bin/env groovy
 def compilecode(){
    echo 'compiling the code'
    sh 'mvn compile'
