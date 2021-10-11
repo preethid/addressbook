@@ -1,11 +1,12 @@
 pipeline{
-    agent any
+    agent none
     tools{
         jdk 'myjava'
         maven 'mymaven'
     }
     stages{
         stage("COMPILE"){
+            agent {label 'linux_slave'}
             steps{
                 script{
                     echo "Compiling the code"
