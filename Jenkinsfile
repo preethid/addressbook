@@ -15,6 +15,7 @@ pipeline{
             }
         }
         stage("UNITTEST"){
+            agent any
             steps{
                 script{
                     echo "Testing the code"
@@ -28,6 +29,7 @@ pipeline{
             }
         }
          stage("PACKAGE"){
+             agent {label 'linux_slave'}
             steps{
                 script{
                     echo "Packaging the code"
@@ -36,6 +38,7 @@ pipeline{
             }
         }
          stage("DEPLOY"){
+            agent any
             steps{
                 script{
                     echo "Deploying the app"
