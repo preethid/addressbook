@@ -6,14 +6,9 @@ pipeline{
         jdk 'myjava'
         maven 'mymaven'
     }
+       def gv = load "script.groovy"
     stages{
-        stage("init"){
-            steps{
-                script{
-                    def gv = load "script.groovy"
-                }
-            }
-        }
+       
         stage("COMPILE"){
             steps{
                 script{
