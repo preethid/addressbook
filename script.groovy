@@ -17,4 +17,4 @@ def deployApp(){
     echo 'building the app'
 }
  
-return this
+return this;
