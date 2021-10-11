@@ -1,7 +1,8 @@
-def gv
 
 pipeline{
     agent any
+    def gv
+
   gv = load ('script.groovy')
     tools{
         jdk 'myjava'
