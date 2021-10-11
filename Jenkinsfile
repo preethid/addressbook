@@ -1,4 +1,5 @@
 def gv
+ gv = load ('script.groovy')
 pipeline{
     agent any
     tools{
