@@ -1,50 +1,57 @@
-def gv
 pipeline{
-    agent any
+    agent none
     tools{
         jdk 'myjava'
         maven 'mymaven'
     }
+    parameters{
+        choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
+        booleanParam(name: 'executeTests',defaultValue: true,description:'tc validity')
+    }
     stages{
-        stage("init"){
+        stage("COMPILE"){
+            agent {label 'linux_slave'}
             steps{
                 script{
-                    gv = load "script.groovy"
+                    echo "Compiling the code"
+                    sh 'mvn compile'
                 }
             }
-        }
-        stage("COMPILE"){
-            steps{
-                script{
-                 gv.compilecode()
-            }
-           }
         }
         stage("UNITTEST"){
-            steps{
-                script{
-                 gv.testapp()
+            agent any
+            when{
+                expression{
+                    params.executeTests == true
+                }
             }
-         }
-        }
-        stage("BUILDING"){
             steps{
                 script{
-                  gv.buildapp()
+                    echo "Testing the code"
+                    sh 'mvn test'
+                }
+            }
+            post{
+                always{
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-        stage("BUILD THE DOCKER IMAGE"){
+         stage("PACKAGE"){
+             agent {label 'linux_slave'}
             steps{
                 script{
-              gv.builddockerimage()
-               }
+                    echo "Packaging the code"
+                    sh 'mvn package'
                 }
             }
+        }
          stage("DEPLOY"){
+            agent any
             steps{
                 script{
-               gv.deployApp()
+                    echo "Deploying the app"
+                    echo "Deploying version ${params.VERSION}"
                 }
             }
         }
