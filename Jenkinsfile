@@ -39,6 +39,11 @@ pipeline{
         }
          stage("PACKAGE"){
              agent {label 'linux_slave'}
+            when{
+                expression{
+                    BRANCH_NAME == 'master'
+                }
+            }
             steps{
                 script{
                     echo "Packaging the code"
@@ -48,6 +53,11 @@ pipeline{
         }
          stage("DEPLOY"){
             agent any
+             when{
+                expression{
+                    BRANCH_NAME == 'master'
+                }
+            }
             steps{
                 script{
                     echo "Deploying the app"
