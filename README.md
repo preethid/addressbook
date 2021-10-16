@@ -1,4 +1,4 @@
-Addressbook Tutorials Giridhar
+Addressbook Tutorials
 ==============================
 #new change
 # changes for test
@@ -14,7 +14,6 @@ Running the example from the command line
 ```
 $ mvn jetty:run
 ```
-# test comment
 
 Open [http://localhost:8080/](http://localhost:8080/)
 
