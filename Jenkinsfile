@@ -69,6 +69,7 @@ pipeline{
                 }
             }
         }
+         }
         stage("DEPLOY"){
             agent any
              when{
