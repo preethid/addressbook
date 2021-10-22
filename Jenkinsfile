@@ -51,7 +51,25 @@ pipeline{
                 }
             }
         }
-         stage("DEPLOY"){
+         stage("BUILD THE DOCKER IMAGE"){
+            agent any
+             when{
+                expression{
+                    BRANCH_NAME == 'master'
+                }
+            }
+            steps{
+                script{
+                    echo "BUILDING THE DOCKER IMAGE"
+                    echo "Deploying version ${params.VERSION}"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                        sh 'sudo docker build -t devopstrainer/myrepoprivate:$BUILD_NUMBER .'
+                        sh 'sudo sudo docker login -u $USER -p $PASS'
+                        sh 'sudo docker push devopstrainer/myrepoprivate:$BUILD_NUMBER'
+                }
+            }
+        }
+        stage("DEPLOY"){
             agent any
              when{
                 expression{
@@ -64,6 +82,5 @@ pipeline{
                     echo "Deploying version ${params.VERSION}"
                 }
             }
-        }
     }
 }
