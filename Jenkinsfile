@@ -1,69 +1,55 @@
 pipeline{
-    agent none
+    agent any
     tools{
-        jdk 'myjava'
-        maven 'mymaven'
+        jdk'myjava'
+        maven 'MYMAVEN'
     }
-    parameters{
-        choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
-        booleanParam(name: 'executeTests',defaultValue: true,description:'tc validity')
+    environment{
+         NEW_VERSION='1.4.0'
     }
     stages{
-        stage("COMPILE"){
-            agent {label 'linux_slave'}
-            steps{
-                script{
-                    echo "Compiling the code"
-                    sh 'mvn compile'
-                }
-            }
+
+         stage("compiling"){
+             steps{
+
+                 script{
+                      echo "compiling the code"
+                      git 'https://github.com/reddyilluri/addressbook-1.git'
+                      sh 'mvn compile'
+
+
+                 }
+             }
+           
+
         }
-        stage("UNITTEST"){
-            agent any
-            when{
-                expression{
-                    params.executeTests == true
-                }
-            }
+        stage("unit test adressbook"){
             steps{
                 script{
-                    echo "Testing the code"
+                    echo "run unit test"
                     sh 'mvn test'
                 }
             }
             post{
                 always{
-                    junit 'target/surefire-reports/*.xml'
+                    junit'target/surefire-reports/*.xml'
                 }
             }
+            
+
         }
-         stage("PACKAGE"){
-             agent {label 'linux_slave'}
-            when{
-                expression{
-                    BRANCH_NAME == 'master'
-                }
-            }
+        stage("package"){
             steps{
                 script{
-                    echo "Packaging the code"
-                    sh 'mvn package'
-                }
+                    echo "building app"
+            echo "building version ${NEW_VERSION}"
+            sh 'mvn package'
             }
+            }
+            
+
         }
-         stage("DEPLOY"){
-            agent any
-             when{
-                expression{
-                    BRANCH_NAME == 'master'
-                }
-            }
-            steps{
-                script{
-                    echo "Deploying the app"
-                    echo "Deploying version ${params.VERSION}"
-                }
-            }
-        }
+
+        
     }
 }
