@@ -69,6 +69,7 @@ pipeline{
                 script{
                     echo "Deploying the app"
                     echo "Deploying version ${params.VERSION}"
+                    sh 'sudo docker run devopstrainer/java-mvn-privaterepo:$BUILD_NUMBER'
                 }
             }
     }
