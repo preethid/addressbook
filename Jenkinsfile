@@ -4,13 +4,15 @@ pipeline{
         jdk 'myjava'
         maven 'mymaven'
     }
+    environment{
+        APP_NAME='java-mvn-app'
+    }
     parameters{
         choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
         booleanParam(name: 'executeTests',defaultValue: true,description:'tc validity')
     }
     stages{
-        stage("COMPILE"){
-          
+        stage("COMPILE"){          
             steps{
                 script{
                     echo "Compiling the code"
@@ -18,8 +20,7 @@ pipeline{
                 }
             }
         }
-        stage("UNITTEST"){
-           
+        stage("UNITTEST"){           
             when{
                 expression{
                     params.executeTests == true
@@ -38,40 +39,34 @@ pipeline{
             }
         }
          stage("PACKAGE"){
-           
-           
-            steps{
+                     steps{
                 script{
                     echo "Packaging the code"
                     sh 'mvn package'
                 }
             }
         }
-         stage("BUILD THE DOCKER IMAGE"){
-         
-            
+         stage("BUILD THE DOCKER IMAGE"){       
             steps{
                 script{
                     echo "BUILDING THE DOCKER IMAGE"
                     echo "Deploying version ${params.VERSION}"
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'sudo docker build -t devopstrainer/java-mvn-privaterepo:$BUILD_NUMBER .'
+                        sh 'sudo docker build -t devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER .'
                         sh 'sudo sudo docker login -u $USER -p $PASS'
-                        sh 'sudo docker push devopstrainer/java-mvn-privaterepo:$BUILD_NUMBER'
+                        sh 'sudo docker push devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
                 }
             }
         }
          }
-        stage("DEPLOY"){
-            
-            
-            steps{
+        stage("DEPLOYONK8S"){
+             steps{
                 script{
                     echo "Deploying the app"
                     echo "Deploying version ${params.VERSION}"
-                    sh 'sudo docker run devopstrainer/java-mvn-privaterepo:$BUILD_NUMBER'
+                    sh 'envsubst java-mvn-deploy-svc.yml < sudo /usr/local/bin/kubectl apply -f -'
                 }
             }
     }
 }
-    }
+}
