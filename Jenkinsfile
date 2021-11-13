@@ -64,7 +64,7 @@ pipeline{
                 script{
                     echo "Deploying the app"
                     echo "Deploying version ${params.VERSION}"
-                    sh 'envsubst Kubernetes/java-mvn-deploy-svc.yml < sudo /usr/local/bin/kubectl apply -f -'
+                    sh 'envsubst < Kubernetes/java-mvn-deploy-svc.yml | sudo /usr/local/bin/kubectl apply -f -'
                 }
             }
     }
