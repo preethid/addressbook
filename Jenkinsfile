@@ -61,20 +61,31 @@ pipeline{
         }
          }
          stage("Provision ec2-server with TF"){
-             sh 'terraform init'
-             sh 'terraform apply'
-         }
+             steps{
+                 script{
+                     dir('terraform'){
+                      sh 'terraform init'
+                      sh 'terraform apply --auto-approve'
+                      EC2_PUBLIC_IP = sh(
+                          "terraform output ec2-ip",
+                          returnStdout: true
+                      ).trim()
+                     }                      
+                 }
+             }
+                     }
         stage("DEPLOYONec2"){
             steps{
                 script{
-                    echo "Deploying the app"
+                    sleep(time: 90, unit: "SECONDS")
+                    echo "ec2-instance created"
+                    echo "${EC2_PUBLIC_IP}"
+                    echo "deploying on an ec2-instance created by TF"
                     echo "Deploying version ${params.VERSION}"
                    sshagent(['deploy-server-key']) {
-                       withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo amazon-linux-extras install docker -y'"
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo systemctl start docker'"
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo docker login -u $USER -p $PASS'"
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo docker run -itd -P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} 'sudo docker login -u $USER -p $PASS'"
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} 'sudo docker run -itd -P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'"
 }
                 }
             }
