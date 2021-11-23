@@ -60,6 +60,10 @@ pipeline{
             }
         }
          }
+         stage("Provision ec2-server with TF"){
+             sh 'terraform init'
+             sh 'terraform apply'
+         }
         stage("DEPLOYONec2"){
             steps{
                 script{
