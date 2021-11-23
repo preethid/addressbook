@@ -60,11 +60,17 @@ pipeline{
         }
          }
         stage("DEPLOYONec2"){
-             steps{
+            steps{
                 script{
                     echo "Deploying the app"
                     echo "Deploying version ${params.VERSION}"
-                    sh 'sudo docker run -itd - P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
+                   sshagent(['deploy-server-key']) {
+                       withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo amazon-linux-extras install docker -y'"
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo systemctl start docker -y'"
+            sh 'sudo sudo docker login -u $USER -p $PASS'
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo docker run -itd -P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'"
+}
                 }
             }
     }
