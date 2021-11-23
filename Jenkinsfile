@@ -59,12 +59,12 @@ pipeline{
             }
         }
          }
-        stage("DEPLOYONK8S"){
+        stage("DEPLOYONec2"){
              steps{
                 script{
                     echo "Deploying the app"
                     echo "Deploying version ${params.VERSION}"
-                    sh 'envsubst < Kubernetes/java-mvn-deploy-svc.yml | sudo /usr/local/bin/kubectl apply -f -'
+                    sh 'sudo docker run -itd - P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
                 }
             }
     }
