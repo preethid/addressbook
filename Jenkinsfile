@@ -53,7 +53,7 @@ pipeline{
                     echo "Deploying version ${params.VERSION}"
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                         sh 'sudo docker build -t devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER .'
-                        sh 'sudo sudo docker login -u $USER -p $PASS'
+                        sh 'sudo docker login -u $USER -p $PASS'
                         sh 'sudo docker push devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
                 }
             }
@@ -68,7 +68,7 @@ pipeline{
                        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo amazon-linux-extras install docker -y'"
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo systemctl start docker -y'"
-            sh 'sudo sudo docker login -u $USER -p $PASS'
+            sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo docker login -u $USER -p $PASS'"
             sh "ssh -o StrictHostKeyChecking=no ec2-user@13.233.87.48 'sudo docker run -itd -P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'"
 }
                 }
