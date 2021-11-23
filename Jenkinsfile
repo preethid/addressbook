@@ -50,9 +50,9 @@ pipeline{
             steps{
                 script{
                     echo "BUILDING THE DOCKER IMAGE"
-                    echo "Deploying version ${params.VERSION}"
+                   sh 'sudo systemctl start docker -y'
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        sh 'sudo systemctl start docker -y'
+                        
                         sh 'sudo docker build -t devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER .'
                         sh 'sudo docker login -u $USER -p $PASS'
                         sh 'sudo docker push devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
