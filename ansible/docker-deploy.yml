@@ -28,5 +28,5 @@
   - name: Test docker pull
     docker_image:
        name: addbookcontainer
-       image: devopstrainer/java-mvn-privaterepos:${BUILD_NUMBER}
+       image: devopstrainer/java-mvn-privaterepos:BUILD_NUMBER
  
