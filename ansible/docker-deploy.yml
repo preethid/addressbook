@@ -28,7 +28,5 @@
   - name: Reconnect to server session
     meta: reset_connection
   - name: Test docker pull
-    docker_image:
-       name: addbookcontainer
-       image: {{image_name}}
+    docker_image: name=addbookcontainer image={{image_name}}
  
