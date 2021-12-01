@@ -3,6 +3,8 @@
   become: true
   become_user: root
   gather_facts: false
+  vars:
+     image_name: devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER
   tasks:
   - name: Install docker
     shell: "sudo amazon-linux-extras install docker -y"
@@ -28,5 +30,5 @@
   - name: Test docker pull
     docker_image:
        name: addbookcontainer
-       image: devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER
+       image: {{image_name}}
  
