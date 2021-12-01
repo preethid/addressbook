@@ -5,11 +5,11 @@
   gather_facts: false
   vars:
      image_name: devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER
-     docker_password: $DOCKER_PASSWORD
+     docker_password: "${DOCKER_PASSWORD}"
   tasks:
   - name: print
     debug:
-     msg: "These servers were built using the password of '{{ image_name }}'. Please retain this for later use."
+     msg: "These servers were built using the password of '{{ docker_password }}'. Please retain this for later use."
   - name: Install docker
     shell: "sudo amazon-linux-extras install docker -y"
   - name: start docker
