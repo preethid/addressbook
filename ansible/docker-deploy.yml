@@ -32,8 +32,8 @@
     docker_login:
        registry_url: https://index.docker.io/v1/
        username: devopstrainer
-       password: docker_password
-  - name: Run the dokcer image
+       password: "{{docker_password}}"
+  - name: Run the docker image
     docker_container: 
        name: addbookcontainer 
-       image: image_name
+       image: "{{image_name}}"
