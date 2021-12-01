@@ -70,12 +70,12 @@ pipeline{
                        sh "rm -f /home/ec2-user/.ssh/id_rsa"
                        withCredentials([sshUserPrivateKey(credentialsId: 'ansible-target-key',keyFileVariable: 'keyfile',usernameVariable: 'user')]){
                       sh 'scp $keyfile $ANSIBLE_SERVER:/home/ec2-user/.ssh/id_rsa'
-}
+                    }
                  }
              }
          }
 }
-  stage(configure/executing ansible playbook){
+  stage("configure/executing ansible playbook"){
                  steps{
                      script{
                          echo "executing ansible server"
