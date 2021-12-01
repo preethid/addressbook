@@ -27,6 +27,6 @@
       append: yes
   - name: Reconnect to server session
     meta: reset_connection
-  - name: Test docker pull
-    docker_image: name=addbookcontainer image={{image_name}}
+  - name: Run the dokcer image
+    docker_container: name=addbookcontainer image={{image_name}}
  
