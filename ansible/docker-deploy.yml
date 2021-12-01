@@ -8,7 +8,7 @@
      docker_password: $DOCKER_PASSWORD
   tasks:
   - name: print
-    ansible.builtin.debug:
+    debug:
     msg:
     - "These servers were built using the password of '{{ docker_password }}'. Please retain this for later use."
   - name: Install docker
