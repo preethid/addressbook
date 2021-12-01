@@ -36,4 +36,4 @@
   - name: Run the dokcer image
     docker_container: 
        name: addbookcontainer 
-       image: "{{image_name}}"
+       image: image_name
