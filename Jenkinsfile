@@ -10,7 +10,6 @@ pipeline{
         DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
         AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
         AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
-
     }
     parameters{
         choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
