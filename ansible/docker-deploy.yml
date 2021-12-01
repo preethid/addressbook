@@ -1,0 +1,31 @@
+---
+- hosts: aws_ec2
+  become: true
+  become_user: root
+  gather_facts: false
+  tasks:
+  - name: Install docker
+    shell: "sudo amazon-linux-extras install docker -y"
+  - name: start docker
+    service: name=docker state=started
+  - name: Install docker python module
+    pip:
+      name:
+      - docker
+      - docker-compose
+  - name: Install docker-compose
+    get_url:
+        url: https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+  - name: Add ec2-user to docker group
+    user:
+      name: ec2-user
+      groups: docker
+      append: yes
+  - name: Reconnect to server session
+    meta: reset_connection
+  - name: Test docker pull
+    docker_image:
+       name: nginx
+       source: pull   

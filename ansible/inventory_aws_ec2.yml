@@ -1,0 +1,7 @@
+---
+plugin: aws_ec2
+regions:
+  - ap-south-1
+filters:
+  key-name: ansible-key
+  instance-state-name: running

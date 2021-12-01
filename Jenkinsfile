@@ -67,6 +67,7 @@ pipeline{
                      echo "copying ansible files to ACM"
                      sshagent(['deploy-server-key']) {
                        sh "scp -o StrictHostKeyChecking=no ansible/* ${ANSIBLE_SERVER}:/home/ec2-user"
+                       sh "rm -f /home/ec2-user/.ssh/id_rsa"
                        withCredentials([sshUserPrivateKey(credentialsId: 'ansible-target-key',keyFileVariable: 'keyfile',usernameVariable: 'user')]){
                       sh 'scp $keyfile $ANSIBLE_SERVER:/home/ec2-user/.ssh/id_rsa'
 }
@@ -74,5 +75,16 @@ pipeline{
              }
          }
 }
+  stage(configure/executing ansible playbook){
+                 steps{
+                     script{
+                         echo "executing ansible server"
+                         sshagent(['deploy-server-key']) {
+                           sh "scp -o StrictHostKeyChecking=no ./configure-ansible.sh ${ANSIBLE_SERVER}:/home/ec2-user"
+                           sh "ssh ${ANSIBLE_SERVER} bash /home/ec2-user/configure-ansible.sh"
+                         }
+                     }
+                 }
+  }
 }
 }
