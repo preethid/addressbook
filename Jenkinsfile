@@ -5,6 +5,7 @@ pipeline{
         maven 'mymaven'
     }
     environment{
+        ANSIBLE_SERVER="ec2-user@172.31.6.99"
         APP_NAME='java-mvn-app'
     }
     parameters{
@@ -60,40 +61,17 @@ pipeline{
             }
         }
          }
-         stage("Provision ec2-server with TF"){
-             environment{
-                 AWS_ACCESS_KEY_ID =credentials("jenkins_aws_access_key_id")
-                 AWS_SECRET_ACCESS_KEY =credentials("jenkins_aws_secret_access_key")
-             }
+         stage("copy ansible files to ACM"){
              steps{
                  script{
-                     dir('terraform'){
-                      sh "terraform init"
-                      sh "terraform apply --auto-approve"
-                       EC2_PUBLIC_IP = sh(
-                     script: "terraform output ec2-ip",
-                     returnStdout: true
-                   ).trim()
-                }
-          }
-        }   
+                     echo "copying ansible files to ACM"
+                     sshagent(['deploy-server-key']) {
+                       sh "scp -o StrictHostKeyChecking=no ansible/* ${ANSIBLE_SERVER}:/home/ec2-user"
+                       withCredentials([sshUserPrivateKey(credentials: 'ansible-target-key',keyFileVariable: 'keyfile',usernameVariable: 'user')])
+                      sh 'scp $keyfile $ANSIBLE_SERVER:/home/ec2-user/.ssh/id_rsa'
+}
+                 }
+             }
          }
-        stage("DEPLOYONec2"){
-            steps{
-                script{
-                    sleep(time: 90, unit: "SECONDS")
-                    echo "ec2-instance created"
-                    echo "${EC2_PUBLIC_IP}"
-                    echo "deploying on an ec2-instance created by TF"
-                    echo "Deploying version ${params.VERSION}"
-                   sshagent(['deploy-server-key']) {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} 'sudo docker login -u $USER -p $PASS'"
-            sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} 'sudo docker run -itd -P devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'"
-}
-                }
-            }
-    }
-}
 }
 }
