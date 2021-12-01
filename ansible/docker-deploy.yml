@@ -5,7 +5,7 @@
   gather_facts: false
   vars:
      image_name: devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER
-     docker_password: $DOCKER_PASSWORD
+     docker_password: "${DOCKER_PASSWORD}"
   tasks:
   - name: Install docker
     shell: "sudo amazon-linux-extras install docker -y"
