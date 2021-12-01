@@ -27,5 +27,6 @@
     meta: reset_connection
   - name: Test docker pull
     docker_image:
-       name: nginx
-       source: pull   
+       name: addbookcontainer
+       image: devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER
+ 

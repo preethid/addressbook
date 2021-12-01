@@ -3,4 +3,4 @@ pip3 install ansible==2.10.7
 /home/ec2-user/.local/bin/ansible --version
 pip3 install boto3
 /home/ec2-user/.local/bin/ansible-inventory -i inventory_aws_ec2.yml --list
-/home/ec2-user/.local/bin/ansible-playbook docker-deploy.yml
+BUILD_NUMBER=$1 /home/ec2-user/.local/bin/ansible-playbook docker-deploy.yml
