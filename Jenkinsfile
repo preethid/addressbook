@@ -7,6 +7,10 @@ pipeline{
     environment{
         ANSIBLE_SERVER="ec2-user@172.31.6.99"
         APP_NAME='java-mvn-app'
+        DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+        AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+
     }
     parameters{
         choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
@@ -81,6 +85,7 @@ pipeline{
                          echo "executing ansible server"
                          sshagent(['deploy-server-key']) {
                            sh "scp -o StrictHostKeyChecking=no ./configure-ansible.sh ${ANSIBLE_SERVER}:/home/ec2-user"
+                           
                            sh "ssh ${ANSIBLE_SERVER} bash /home/ec2-user/configure-ansible.sh"
                          }
                      }
