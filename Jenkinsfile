@@ -1,94 +1,65 @@
-pipeline{
-    agent any
+pipeline {
+    agent none
     tools{
         jdk 'myjava'
         maven 'mymaven'
     }
-    environment{
-        ANSIBLE_SERVER="ec2-user@172.31.6.99"
+     environment{
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
+        DEV_SERVER_IP='ec2-user@3.109.4.223'
         APP_NAME='java-mvn-app'
-        DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
-        AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
-        AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
     }
-    parameters{
-        choice(name:'VERSION',choices:['1.1.0','1.2.0','1.3.0'],description:'version of the code')
-        booleanParam(name: 'executeTests',defaultValue: true,description:'tc validity')
-    }
-    stages{
-        stage("COMPILE"){          
-            steps{
+    stages {
+        stage('COMPILE') {
+            agent any
+            steps {
                 script{
-                    echo "Compiling the code"
+                    echo "COMPILING THE CODE"
+                    git 'https://github.com/preethid/addressbook-1.git'
                     sh 'mvn compile'
                 }
+                          }
             }
-        }
-        stage("UNITTEST"){           
-            when{
-                expression{
-                    params.executeTests == true
-                }
-            }
-            steps{
+        stage('UNITTEST'){
+            agent any
+            steps {
                 script{
-                    echo "Testing the code"
+                    echo "RUNNING THE UNIT TEST CASES"
                     sh 'mvn test'
                 }
+              
             }
             post{
                 always{
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-        }
-         stage("PACKAGE"){
-                     steps{
-                script{
-                    echo "Packaging the code"
-                    sh 'mvn package'
-                }
             }
-        }
-         stage("BUILD THE DOCKER IMAGE"){       
-            steps{
+        stage('PACKAGE+BUILD DOCKER IMAGE ON BUILD SERVER'){
+            agent any
+           steps{
                 script{
-                    echo "BUILDING THE DOCKER IMAGE"
-                   sh 'sudo systemctl start docker'
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                        
-                        sh 'sudo docker build -t devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER .'
-                        sh 'sudo docker login -u $USER -p $PASS'
-                        sh 'sudo docker push devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-                }
-            }
-        }
-         }
-         stage("copy ansible files to ACM"){
-             steps{
-                 script{
-                     echo "copying ansible files to ACM"
-                     sshagent(['deploy-server-key']) {
-                       sh "scp -o StrictHostKeyChecking=no ansible/* ${ANSIBLE_SERVER}:/home/ec2-user"
-                       sh "ssh ${ANSIBLE_SERVER} rm -f /home/ec2-user/.ssh/id_rsa"
-                       withCredentials([sshUserPrivateKey(credentialsId: 'ansible-target-key',keyFileVariable: 'keyfile',usernameVariable: 'user')]){
-                      sh 'scp $keyfile $ANSIBLE_SERVER:/home/ec2-user/.ssh/id_rsa'
+            sshagent(['Test_server-Key']) {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                     echo "PACKAGING THE CODE"
+                     sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER_IP}:/home/ec2-user"
+                     sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER_IP} 'bash ~/server-script.sh'"
+                     sh "ssh ${DEV_SERVER_IP} sudo docker build -t  ${IMAGE_NAME} /home/ec2-user/addressbook-1"
+                    sh "ssh ${DEV_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                    sh "ssh ${DEV_SERVER_IP} sudo docker push ${IMAGE_NAME}"
                     }
-                 }
-             }
-         }
-}
-  stage("configure/executing ansible playbook"){
-                 steps{
-                     script{
-                         echo "executing ansible server"
-                         sshagent(['deploy-server-key']) {
-                           sh "scp -o StrictHostKeyChecking=no ./configure-ansible.sh ${ANSIBLE_SERVER}:/home/ec2-user"
-                           
-                           sh "ssh ${ANSIBLE_SERVER} bash /home/ec2-user/configure-ansible.sh"
-                         }
-                     }
-                 }
-  }
-}
+                    }
+                }
+            }
+        }
+        stage('DEPLOY ON K8S cluster'){
+            agent any
+                steps{
+                    script{
+                        echo "RUN THE APP ON K8S CLUSTER"
+                        sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
+                }
+            }
+            }
+    }
 }
