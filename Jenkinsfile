@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script{
                     echo "COMPILING THE CODE"
-                    git 'https://github.com/preethid/addressbook-1.git'
+                    git 'https://github.com/preethid/addressbook.git'
                     sh 'mvn compile'
                 }
                           }

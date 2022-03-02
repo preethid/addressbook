@@ -6,7 +6,7 @@ if [ -d "addressbook" ]
 then 
   echo "repo is cloned and exists"
   cd /home/ec2-user/addressbook
-  git pull origin democicd
+  git pull origin cicd-ansible
 else
   git clone https://github.com/preethid/addressbook.git
 fi
