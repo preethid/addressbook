@@ -54,5 +54,5 @@ resource "aws_instance" "web" {
   tags = {
     Name = "${var.env}-instance"
   }
-  user_data = file("server-script.sh")
+  user_data = file("TF-server-script.sh")
 }
