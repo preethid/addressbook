@@ -50,7 +50,7 @@ resource "aws_instance" "web" {
    associate_public_ip_address =true
    subnet_id=var.subnet_id
   vpc_security_group_ids = [aws_security_group.mywebsecurity.id]
-   key_name="ansiblekey"
+   key_name="ansible-key"
   tags = {
     Name = "${var.env}-instance"
   }
