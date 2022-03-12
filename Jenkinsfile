@@ -38,7 +38,7 @@ pipeline {
         stage('PACKAGE+BUILD DOCKER IMAGE ON BUILD SERVER'){
             agent any
            steps{
-                script{
+            script{
             sshagent(['Test_server-Key']) {
         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                      echo "PACKAGING THE CODE"
@@ -52,12 +52,35 @@ pipeline {
                 }
             }
         }
-        stage('DEPLOY ON K8S cluster'){
+        stage("Provision deploy server with TF"){
+             agent any
+                   steps{
+                       script{
+                           sh "terraform init"
+                           sh "terraform apply --auto-approve"
+                           EC2_PUBLIC_IP = sh(
+                            script: "terraform output ec2-ip",
+                            returnStdout: true
+                           ).trim()
+                       }
+                   }
+        }
+        stage('DEPLOY ON EC2 instance'){
             agent any
                 steps{
                     script{
-                        echo "RUN THE APP ON K8S CLUSTER"
-                        sh 'envsubst < java-mvn-app.yml | sudo /usr/local/bin/kubectl apply -f -'
+                echo "RUN THE APP ON ec2 instance"
+                echo "Waiting for ec2 instance to initialise"
+               sleep(time: 90, unit: "SECONDS")
+               echo "Deploying the app to ec2-instance provisioned bt TF"
+               echo "${EC2_PUBLIC_IP}"
+               sshagent(['DEPLOY_SERVER']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                      sh "ssh ${EC2_PUBLIC_IP} sudo yum install docker -y"
+                      sh "ssh ${EC2_PUBLIC_IP} sudo systemctl  start docker"
+                      sh "ssh ${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                      sh "ssh ${EC2_PUBLIC_IP} sudo docker run -itd -P ${IMAGE_NAME}"
+                      
                 }
             }
             }
