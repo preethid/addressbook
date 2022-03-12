@@ -13,8 +13,8 @@ resource "aws_security_group" "mywebsecurity" {
  
   ingress {
     description      = "HTTP"
-    from_port        = 8080
-    to_port          = 8080
+    from_port        = 8001
+    to_port          = 8001
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
      }
