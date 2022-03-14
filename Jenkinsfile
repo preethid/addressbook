@@ -6,7 +6,7 @@ pipeline {
     }
      environment{
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-        DEV_SERVER_IP='ec2-user@35.154.145.226'
+        DEV_SERVER_IP='ec2-user@3.111.198.154'
         APP_NAME='java-mvn-app'
     }
     stages {
