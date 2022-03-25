@@ -1,56 +1,48 @@
-pipeline{
-    agent none
-    tools{
-        jdk 'myjava'
-        maven 'mymaven'
-    }
-    environment{
-        NEW_VERSION='1.4.0'
-    }
-    stages{
-        stage("COMPILE"){
-            agent {label 'linux_slave'}
-            steps{
-                script{
-                     echo "Compiling the code"
-                     git 'https://github.com/preethid/addressbook.git'
-                     sh 'mvn compile'
+pipeline {
+   agent none
+   tools{
+         jdk 'Myjava'
+         maven 'mymaven'
+   }
+   environment{
+       TEST_SERVER_IP='ec2-user@172.31.43.56'
+   }
+    stages {
+        stage('Compile') {
+           agent any
+            steps {
+              script{
+                  echo "BUILDING THE CODE"
+                  sh 'mvn compile'
+              }
+            }
+            }
+            stage('UnitTest') {
+              agent any
+            steps {
+              script{
+                  sshagent(['TEST_SERVER']) {
+                   echo "TESTING THE CODE"
+                   sh "scp -o StrictHostKeyChecking=no server-script.sh ${TEST_SERVER_IP}:/home/ec2-user"
+                  sh "ssh -o StrictHostKeyChecking=no ${TEST_SERVER_IP} 'bash ~/server-script.sh'"
+                   }
+              }
+            }
+            post{
+                always{
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
-                    }
-        stage("UnitTest"){
-            agent any
-            
-              steps{
-                script{
-             echo "Run the unit test"
-             sh 'mvn test'
-        }
+            }
+             stage('Package') {
+              agent {label 'linux_slave'}
+            steps {
+              script{
+                  echo "Packaging the apps"
+                  sh 'mvn package'
               }
-              post{
-                  always{
-                      junit 'target/surefire-reports/*.xml'
-                  }
-              }
-        }
-        stage("Package"){
-            agent {label 'linux_slave'}
-              steps{
-                script{
-              echo "Building the app"
-              echo "building version ${NEW_VERSION}"
-              sh 'mvn package'
-        }
-    }
-        }
-    stage("Deploy"){
-      
-        steps{
-            script{
-                echo "Deploying the app"
-                echo "Deploying ${NEW_VERSION}"
+            }
             }
         }
-    }
-    }
+    
 }
