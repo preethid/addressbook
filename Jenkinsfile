@@ -7,6 +7,7 @@ pipeline {
    environment{
        BUILD_SERVER_IP='ec2-user@35.154.187.90'
        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
+       DEPLOY_SERVER_IP='ec2-user@13.126.71.124'
    }
     stages {
         stage('Compile') {
@@ -49,5 +50,20 @@ pipeline {
             }
         }
         }
+       stage('DEPLOY DOCKER CONATINER'){
+           agent any
+           steps{
+               script{
+                    sshagent(['DEPLOY_SERVER_KEY']){
+                         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                         sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
+                         sh "ssh ${DEPLOY_SERVER_IP} sudo systemctl start docker"
+                         sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                         sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
+                         }
+                    }
+               }
+           }
+       }
     }
 }
