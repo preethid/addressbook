@@ -11,4 +11,4 @@ else
  git clone https://github.com/preethid/addressbook.git
  cd /home/ec2-user/addressbook
 fi
- mvn test
+ mvn package

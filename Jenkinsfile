@@ -5,7 +5,7 @@ pipeline {
          maven 'mymaven'
    }
    environment{
-       TEST_SERVER_IP='ec2-user@172.31.43.56'
+       BUILD_SERVER_IP='ec2-user@172.31.43.56'
    }
     stages {
         stage('Compile') {
@@ -18,14 +18,13 @@ pipeline {
             }
             }
             stage('UnitTest') {
-              agent any
+              agent {label 'linux_slave'}
             steps {
               script{
                   sshagent(['TEST_SERVER']) {
                    echo "TESTING THE CODE"
-                   sh "scp -o StrictHostKeyChecking=no server-script.sh ${TEST_SERVER_IP}:/home/ec2-user"
-                  sh "ssh -o StrictHostKeyChecking=no ${TEST_SERVER_IP} 'bash ~/server-script.sh'"
-                   }
+                   sh "mvn test"
+
               }
             }
             post{
@@ -35,11 +34,12 @@ pipeline {
             }
             }
              stage('Package') {
-              agent {label 'linux_slave'}
+             sshagent(['BUILD_SERVER']) {
             steps {
               script{
                   echo "Packaging the apps"
-                  sh 'mvn package'
+                   sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
+                sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-script.sh'"
               }
             }
             }
