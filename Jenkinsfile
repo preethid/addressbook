@@ -49,13 +49,12 @@ pipeline {
             }
         }
         }
-       stage('DEPLOY on k8s cluster'){
+       stage('Provision the server with TF'){
            agent any
            steps{
                script{
-                   echo "RUN THE APP ON K8S CLUSTER"
-                   sh 'envsubst < java-mvn-app.yml | sudo /usr/local/bin/kubectl apply -f -'
-                  
+                   echo "RUN THE TF Code"
+                                     
                }
            }
        }
