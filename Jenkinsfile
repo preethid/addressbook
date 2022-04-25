@@ -5,7 +5,7 @@ pipeline {
          maven 'mymaven'
    }
    environment{
-       BUILD_SERVER_IP='ec2-user@3.6.160.208'
+       BUILD_SERVER_IP='ec2-user@13.233.147.135'
        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
    }
     stages {
@@ -54,9 +54,32 @@ pipeline {
            steps{
                script{
                    echo "RUN THE TF Code"
+                   dir('terraform'){
+                       sh "terraform init"
+                       sh "terraform apply --auto-approve"
+                    EC2_PUBLIC_IP=sh(
+                        script: "terraform output ec2-ip",
+                        returnStdout: true
+                    ).trim()
+                   }
                                      
                }
            }
        }
-    }
+       stage("Deploy on EC2 instance created by TF"){
+          agent any
+           steps{
+               script{
+                   echo "Deployin on the instance"
+                     sshagent(['DEPLOY_SERVER_KEY']) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                      sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}"
+                     
+                }
+            }
+            }
+                }
+                }
+                   }
 }
