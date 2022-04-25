@@ -75,6 +75,7 @@ pipeline {
            steps{
                script{
                    echo "Deployin on the instance"
+                    echo "${EC2_PUBLIC_IP}"
                      sshagent(['DEPLOY_SERVER_KEY']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                       sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
