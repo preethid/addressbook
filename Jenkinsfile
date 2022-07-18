@@ -19,7 +19,7 @@ pipeline{
            steps{
               sshagent(['jenkins-slave']) {
                     echo "Package the code"
-              
+               sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.46.17 'echo 'hi'"
             }              
             }
             
