@@ -1,12 +1,7 @@
 pipeline{
     agent any
     stages{
-        stage("Checkout"){
-            steps{
-                echo "Clone the repo"
-            }
-            
-        }   
+      
         stage("Compile"){
           steps{
                 echo "Compile the code"
