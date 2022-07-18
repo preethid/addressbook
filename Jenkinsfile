@@ -4,7 +4,7 @@ pipeline{
       
         stage("Compile"){
           steps{
-                echo "Compile the code"
+                echo "Compile the code v1"
             }
         }
         stage("UnitTest"){
