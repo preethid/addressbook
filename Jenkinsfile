@@ -3,7 +3,7 @@ pipeline{
     stages{
       
         stage("Compile"){
-            agent { label 'linux_slave'}
+         agent { label 'linux_slave'}
           steps{
                 echo "Compile the code v1"
             }
@@ -17,7 +17,10 @@ pipeline{
         stage("Package"){
             agent any
            steps{
-                echo "Package the code"
+              sshagent(['jenkins-slave']) {
+                    echo "Package the code"
+              
+            }              
             }
             
         }
