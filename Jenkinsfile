@@ -3,7 +3,7 @@ pipeline{
     stages{
       
         stage("Compile"){
-            agent label{'linux_slave'}
+            agent { label 'linux_slave'}
           steps{
                 echo "Compile the code v1"
             }
