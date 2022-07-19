@@ -4,6 +4,9 @@ pipeline{
         jdk 'myjava'
         maven 'mymaven'
     }
+    environment{
+        SERVER_IP='ec2-user@65.0.169.71'
+    }
     stages{
       
         stage("Compile"){
@@ -23,9 +26,14 @@ pipeline{
         stage("Package"){
              agent any
            steps{
+             script{
+                sshagent(['jenkins-slave']) {
+                 echo "Package the code"
+                 sh "ssh -o StrictHostKeyChecking=no ${SERVER_IP} 'mvn package'"     
+             }
             
-                echo "Package the code"
-                sh 'mvn package'         
+              
+               
             }
             
         }
