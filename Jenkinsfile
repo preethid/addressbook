@@ -31,7 +31,7 @@ pipeline{
                 message "select the version for package"
                 ok "version selected"
                 parameters{
-                    choice(name:'NEWAPP',choices['A','B','C'])
+                    choice(name:'NEWAPP',choices:['A','B','C'])
                 }
             }
             
