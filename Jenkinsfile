@@ -1,25 +1,35 @@
 pipeline{
-    agent none
+    agent any
+    parameters{
+        string(name:'ENV',defaultValue:'TEST',description:'versiontoeploy')
+        booleanParam(name:'executeTests',defaultValue: true,description:'decidetorunthetc')
+        choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
+    }
     stages{
       
         stage("Compile"){
-         agent { label 'linux_slave'}
+         
           steps{
                 echo "Compile the code v1"
             }
         }
         stage("UnitTest"){
-            agent any
+          when{
+            expression{
+                params.executeTests == true
+            }
+          }
            steps{
                 echo "Run the TC"
             }
         }
         stage("Package"){
-            agent any
+            
            steps{
-              sshagent(['jenkins-slave']) {
+            
                     echo "Package the code"
-               sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.46.17 'echo 'hi'"
+                  echo "Deploying to env: ${params.ENV}"
+                  echo "Deploying the app version: ${params.APPVERSION}"
             }              
             }
             
