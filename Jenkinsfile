@@ -5,6 +5,9 @@ pipeline{
         booleanParam(name:'executeTests',defaultValue: true,description:'decidetorunthetc')
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
     }
+    environment{
+        NEW_VERSION='2.1'
+    }
     stages{
       
         stage("Compile"){
@@ -30,6 +33,7 @@ pipeline{
                     echo "Package the code"
                   echo "Deploying to env: ${params.ENV}"
                   echo "Deploying the app version: ${params.APPVERSION}"
+                  echo "Newapp version: ${NEW_VERSION}"
             }              
             }
             
