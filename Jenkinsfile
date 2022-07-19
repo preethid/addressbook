@@ -11,7 +11,11 @@ pipeline{
     stages{
       
         stage("Compile"){
-         
+         when{
+            expression{
+                BRANCH_NAME == 'test'
+            }
+         }
           steps{
                 echo "Compile the code v1"
             }
@@ -27,6 +31,11 @@ pipeline{
             }
         }
         stage("Package"){
+             when{
+    expression{
+        BRANCH_NAME == 'master'
+    }
+ }
             input{
                 message "select the version for package"
                 ok "version selected"
