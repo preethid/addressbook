@@ -29,7 +29,8 @@ pipeline{
              script{
                 sshagent(['jenkins-slave']) {
                  echo "Package the code"
-                 sh "ssh -o StrictHostKeyChecking=no ${SERVER_IP} 'mvn package'"     
+                sh "scp -o StrictHostKeyChecking=no server-script.sh ${SERVER_IP}:/home/ec2-user"
+                 sh "ssh -o StrictHostKeyChecking=no ${SERVER_IP} 'bash ~/server-script.sh'"     
              }
             
               
