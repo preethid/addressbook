@@ -24,13 +24,13 @@ pipeline{
             }
         }
         stage("Package"){
-             agent any
+            agent any
            steps{
              script{
                 sshagent(['jenkins-slave']) {
                  echo "Package the code"
                 sh "scp -o StrictHostKeyChecking=no server-script.sh ${SERVER_IP}:/home/ec2-user"
-                 sh "ssh -o StrictHostKeyChecking=no ${SERVER_IP} 'bash ~/server-script.sh'"     
+                sh "ssh -o StrictHostKeyChecking=no ${SERVER_IP} 'bash ~/server-script.sh'"     
              }
             
               
