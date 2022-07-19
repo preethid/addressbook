@@ -13,7 +13,7 @@ pipeline{
         stage("Compile"){
          when{
             expression{
-                BRANCH_NAME == 'test'
+                BRANCH_NAME == 'test' || BRANCH_NAME == 'master'
             }
          }
           steps{
