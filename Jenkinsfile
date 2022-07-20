@@ -5,7 +5,7 @@ pipeline{
         maven 'mymaven'
     }
     environment{
-        SERVER_IP='ec2-user@65.0.169.71'
+        SERVER_IP='ec2-user@65.0.185.59'
     }
     stages{
       
