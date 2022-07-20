@@ -22,6 +22,11 @@ pipeline{
                 echo "Run the TC"
                 sh 'mvn test'
             }
+          post{
+            always{
+                junit 'target/surefire-reports/*.xml'
+            }
+          }
         }
         stage("Package"){
             agent any
