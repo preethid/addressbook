@@ -56,7 +56,7 @@ pipeline{
         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
             echo "Deploying the app"
             sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-            sh "ssh  ${DEPLOY_SERVER_IP} sudo start docker"
+            sh "ssh  ${DEPLOY_SERVER_IP} sudo systemctl start docker"
             sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
             sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
    }
