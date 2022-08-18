@@ -48,21 +48,15 @@ pipeline{
             
         }
     }
-    stage("Deploy the app"){
+    stage("Deploy ON K8S CLUSTER"){
     agent any
    steps{
-     script{
-        sshagent(['jenkins-slave']) {
-        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-            echo "Deploying the app"
-            sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-            sh "ssh  ${DEPLOY_SERVER_IP} sudo systemctl start docker"
-            sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-            sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
-   }
-}
-     }
-   }
+     script{     
+       
+            echo "Deploying the app on k8s EKS cluster"
+            sh 'envsubst < java-mvn-app.yml | sudo /usr/local/bin/kubectl apply -f -'
+                }
     }
+}
     }
 }
