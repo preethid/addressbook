@@ -1,10 +1,15 @@
 pipeline {
     agent any
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
+        }
     stages {
         stage('COMPILE') {
             steps {
                 script{
                 echo 'COMPILE THE CODE'
+                sh 'mvn compile'
                 }
             }
         }
@@ -12,6 +17,7 @@ pipeline {
             steps {
                 script{
                 echo 'RUN THE UNIT TC'
+                sh 'mvn test'
                 }
             }
         }
@@ -19,6 +25,7 @@ pipeline {
            steps {
                 script{
                 echo "PACKAGE THE CODE"
+                sh 'mvn package'
                 }
             }
         }
