@@ -6,13 +6,6 @@ pipeline {
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
      }
     stages {
-        stage('Hello') {
-            steps {
-                script{
-                echo 'Hello World'
-                }
-            }
-        }
         stage('Compile') {
             steps {
                 script{
