@@ -9,6 +9,8 @@ terraform {
 provider "aws" {
   # Configuration options
   region = var.region
+  access_key = "my-access-key"
+  secret_key = "my-secret-key"
 }
 # 1)create a vpc
 resource "aws_vpc" "ownvpc" {
