@@ -1,0 +1,23 @@
+---
+- hosts: aws_ec2
+  become: true
+  become_user: root
+  gather_facts: false
+  tasks:
+  - name: Install docker
+    vars:
+      ansible_python_interpreter: /usr/bin/python
+    yum: name=docker state=present
+  - name: start docker
+    service: name=docker state=started
+  - name: Install docker python modules
+    pip:
+      name:
+      - docker
+  - name: Docker test
+    docker_image: name=nginx source=pull
+  - name: docker login
+    docker_login: registry_url=https://index.docker.io/v1/ username=devopstrainer password={{DOCKER_REG_PASSWORD}}
+  - name: run the docker image
+    docker_container: name=addbook image={{DOCKER_IMAGE}} published_ports="8001:8080"
+     
