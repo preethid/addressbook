@@ -68,6 +68,7 @@ pipeline {
                      sh "ssh ${ANSIBLE_TARGET_PUBLIC_IP} sudo docker build -t  ${IMAGE_NAME} /home/ec2-user/addressbook"
                     sh "ssh ${ANSIBLE_TARGET_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
                     sh "ssh ${ANSIBLE_TARGET_PUBLIC_IP} sudo docker push ${IMAGE_NAME}"
+                    sh "ssh ${ANSIBLE_TARGET_PUBLIC_IP} sudo docker run -itd -p 8080:8080 ${IMAGE_NAME}"
                     }
                     }
                 }
