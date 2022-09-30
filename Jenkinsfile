@@ -7,6 +7,13 @@ pipeline {
       }
        stages {
         stage('Compile') {
+            input{
+                message: "Select the version to compile"
+                ok "Version selected"
+                parameters{
+                    choice(name:'NEWAPP',choices:['v1','v2','v3'])
+                }
+            }
             steps {
                 echo "COMPILING THE CODe"
                           
