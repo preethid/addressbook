@@ -30,6 +30,7 @@ pipeline {
             steps {
                 echo "PACKAGING THE CODE"
               echo "Deploying to env: ${params.ENV}"
+              echo "Deploying version: ${params.APPVERSION}"
               }  
         }
     }
