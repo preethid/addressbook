@@ -11,6 +11,7 @@ pipeline {
                 echo "COMPILING THE CODe"
                           
         }
+        }
         stage('UnitTest') {
             
             when{
