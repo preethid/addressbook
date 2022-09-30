@@ -7,6 +7,11 @@ pipeline {
       }
        stages {
         stage('Compile') {
+            when{
+                expression{
+                    BRANCH_NAME == 'dev' || BRANCH_NAME == 'test'
+                }
+            }
             input{
                 message "Select the version to compile"
                 ok "Version selected"
