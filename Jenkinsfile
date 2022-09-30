@@ -4,6 +4,9 @@ pipeline {
         jdk 'myjava'
         maven 'mymaven'
     }
+    environment{
+        BUILD_SERVER_IP="ec2-user@52.66.251.149"
+    }
       stages {
         stage('Compile') {
             agent any
@@ -34,8 +37,8 @@ pipeline {
             steps {
                 echo "PACKAGING THE CODE"
                 sshagent(['BUILD_SERVER_KEY']) {
-                sh "scp -o StrictHostKeyChecking=no server-script.sh ec2-user@52.66.251.149:/home/ec2-user"
-                sh "ssh -o StrictHostKeyChecking=no ec2-user@52.66.251.149 'bash ~/server-script.sh'"    
+                sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
+                sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-script.sh'"    
               }  
         }
     }
