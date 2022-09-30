@@ -15,7 +15,7 @@ pipeline {
                 }
             }
             steps {
-                echo "COMPILING THE CODE: ${params.NEWAPP}"
+                echo "COMPILING THE CODE: ${NEWAPP}"
                           
         }
         }
