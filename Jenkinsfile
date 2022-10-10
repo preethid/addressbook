@@ -10,8 +10,8 @@ pipeline {
         DEV_SERVER_IP='ec2-user@13.235.238.57'
         ACM_IP='ec2-user@13.235.99.39'
         APP_NAME='java-mvn-app'
-        AWS_ACCESS_KEY_ID =credentials("AWS_ACCESS_KEY_ID")
-        AWS_SECRET_ACCESS_KEY=credentials("AWS_SECRET_ACCESS_KEY")
+        AWS_ACCESS_KEY_ID =credentials("jenkins_aws_access_key_id")
+        AWS_SECRET_ACCESS_KEY=credentials("jenkins_aws_secret_access_key")
         //created a new credential of type secret text to store docker pwd
         DOCKER_REG_PASSWORD=credentials("DOCKER_REG_PASSWORD")
     }
@@ -81,7 +81,7 @@ pipeline {
                sshagent(['ssh-key']) {
     sh "scp -o StrictHostKeyChecking=no ansible/* ${ACM_IP}:/home/ec2-user"
     //copy the ansible target key on ACM as private key file
-    withCredentials([sshUserPrivateKey(credentialsId: 'ANSIBLE_TARGET_KEY',keyFileVariable: 'keyfile',usernameVariable: 'user')]){ 
+    withCredentials([sshUserPrivateKey(credentialsId: 'Ansible_target',keyFileVariable: 'keyfile',usernameVariable: 'user')]){ 
     sh "scp $keyfile ${ACM_IP}:/home/ec2-user/.ssh/id_rsa"    
     }
     //install aws credetials plugin in jenkins --another way
