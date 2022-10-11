@@ -8,16 +8,16 @@ pipeline {
         BUILD_SERVER_IP="ec2-user@52.66.251.149"
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
     }
-      stages {
-        stage('Compile') {
+    stages {
+        stage('COMPILE') {
             agent any
-           steps {
-            script{
-                   echo "COMPILING THE CODE"
-                    sh 'mvn compile'          
-            }        
+            steps {
+                script{
+                    echo "COMPILING THE CODE"
+                    sh 'mvn compile'
+                }
+                          }
             }
-        }
         stage('UnitTest') {
           agent any
            steps {
@@ -31,9 +31,8 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-            
-        }
-        stage('Package+BUILD THE DOCKER IMAGE') {
+            }
+       stage('Package+BUILD THE DOCKER IMAGE') {
             agent any
             steps {
                 script{
@@ -50,6 +49,7 @@ pipeline {
               }  
             }
         }
+        }
+        }    
     }
-}
-}
+    
