@@ -5,7 +5,7 @@ pipeline {
         maven 'mymaven'
     }
     environment{
-        BUILD_SERVER_IP="ec2-user@52.66.251.149"
+        BUILD_SERVER_IP="ec2-user@43.204.141.135"
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
     }
     stages {
