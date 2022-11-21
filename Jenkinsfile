@@ -1,35 +1,24 @@
 pipeline {
     agent any
-    parameters{
-        string(name:'ENV',defaultValue:'Test',description:'env to deploy')
-        booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
-        choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
     }
-   stages {
+    stages {
         stage('Compile') {
             steps {
                 script{
                     echo "COMPILING THE CODE"
+                    sh 'mvn compile'
                 }
             }
 
            }
         stage('UnitTest') {
-            input{
-                message "Select the version to run TC"
-                ok "Version Selected"
-                parameters{
-                    choice(name:'VERSION',choices:['1','2','3'])
-                }
-            }
-            when{
-                expression{
-                    params.executeTests == true
-                }
-            }
             steps {
                 script{
                     echo "RUN THE UNIT TEST CASES"
+                    sh 'mvn test'
                 }
             }
 
@@ -38,9 +27,8 @@ pipeline {
             steps {
                 script{
                     echo "PACKAGE THE CODE"
-                    echo "Deploy to env: ${params.ENV}"
-                    echo "deploying the app version: ${params.APPVERSION}"
-                }
+                    sh 'mvn package'
+                }       
             }
 
            }
