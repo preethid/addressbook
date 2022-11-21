@@ -1,6 +1,10 @@
 pipeline {
     agent any
-
+    parameters{
+        string(name:'ENV',defaultValue:'Test',description:'env to deploy')
+        booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
+        choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
+    }
    stages {
         stage('Compile') {
             steps {
@@ -22,6 +26,8 @@ pipeline {
             steps {
                 script{
                     echo "PACKAGE THE CODE"
+                    echo "Deploy to env: ${params.ENV}"
+                    echo "deploying the app version: ${params.APPVERSION}"
                 }
             }
 
