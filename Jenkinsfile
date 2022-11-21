@@ -15,6 +15,13 @@ pipeline {
 
            }
         stage('UnitTest') {
+            input{
+                message "Select the version to run TC"
+                ok "Version Selected"
+                parameters{
+                    choice(name:'VERSION',choices:['1','2','3'])
+                }
+            }
             when{
                 expression{
                     params.executeTests == true
