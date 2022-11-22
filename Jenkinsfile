@@ -34,6 +34,7 @@ pipeline {
               agent any
             steps {
                 script{
+                    sshagent(['ssh-key']) {
                     echo "PACKAGE THE CODE"
                     sh 'mvn package'
                 }       
@@ -41,4 +42,5 @@ pipeline {
 
            }
     }
+}
 }
