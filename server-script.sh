@@ -13,4 +13,4 @@ else
 fi
  mvn package
  sudo yum install docker -y
- systemctl start docker
+ sudo systemctl start docker
