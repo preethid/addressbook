@@ -47,7 +47,7 @@ pipeline {
                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-script.sh'"
                     sh "ssh ${BUILD_SERVER_IP} sudo docker build -t ${IMAGE_NAME} /home/ec2-user/addressbook"
                     sh "ssh ${BUILD_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                    sh "ssh ${BUILD_SERVER_IP} sudo push ${IMAGE_NAME}"
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker push ${IMAGE_NAME}"
                 }       
             }
                 }
@@ -62,7 +62,7 @@ pipeline {
                 sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
                 sh "ssh   ${DEPLOY_SERVER_IP} sudo systemctl start docker"
                     sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo run -itd -P ${IMAGE_NAME}"
+                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
             
 
         }
