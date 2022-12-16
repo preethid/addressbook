@@ -53,22 +53,31 @@ pipeline {
                 }
            }
     }
-      stage('Deploy the docker image'){
+    //   stage('Deploy the docker image'){
+    //   agent any 
+    //    steps{
+    //     script{
+    //         sshagent(['ssh-key']) {
+    //          withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+    //             sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
+    //             sh "ssh   ${DEPLOY_SERVER_IP} sudo systemctl start docker"
+    //                 sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+    //                 sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
+            
+
+    //     }
+    //    }
+    //     }
+    //    }
+    // }
+      stage('Deploy on K8s'){
       agent any 
        steps{
         script{
-            sshagent(['ssh-key']) {
-             withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-                sh "ssh   ${DEPLOY_SERVER_IP} sudo systemctl start docker"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
-            
-
+            echo "Run the app on k8s cluster"
+            sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
         }
        }
         }
        }
     }
-}
-}
