@@ -5,7 +5,7 @@ pipeline {
         maven 'mymaven'
     }
     environment{
-        BUILD_SERVER_IP='ec2-user@13.233.27.159'
+        BUILD_SERVER_IP='ec2-user@3.109.58.132'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
         DEPLOY_SERVER_IP='ec2-user@43.205.126.36'
     }
