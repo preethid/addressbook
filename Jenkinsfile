@@ -75,7 +75,7 @@ pipeline {
        steps{
         script{
             echo "Run the app on k8s cluster"
-            sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
+            sh 'envsubst < java-mvn-app.yml | /usr/local/bin/kubectl apply -f -'
         }
        }
         }
