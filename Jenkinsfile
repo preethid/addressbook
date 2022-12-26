@@ -1,6 +1,9 @@
 pipeline {
     agent none
-    
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
+    }
      environment{
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
         DEV_SERVER_IP='ec2-user@52.66.240.173'
@@ -9,10 +12,16 @@ pipeline {
     stages {
         stage('COMPILE') {
             agent any
+            tools{
+        jdk 'myjava'
+        maven 'mymaven'
+    }
             steps {
                 script{
                     echo "COMPILING THE CODE"
                     git 'https://github.com/preethid/addressbook.git'
+                    tool name: 'mymaven', type: 'maven'
+                    
                     sh 'mvn compile'
                 }
                           }
