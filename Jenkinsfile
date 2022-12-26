@@ -4,81 +4,90 @@ pipeline {
         jdk 'myjava'
         maven 'mymaven'
     }
-    environment{
-        BUILD_SERVER_IP='ec2-user@3.109.58.132'
+     environment{
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-        DEPLOY_SERVER_IP='ec2-user@43.205.126.36'
+        DEV_SERVER_IP='ec2-user@52.66.240.173'
+        APP_NAME='java-mvn-app'
     }
     stages {
-        stage('Compile') {
-            //agent {label 'linux_slave'}
+        stage('COMPILE') {
             agent any
             steps {
                 script{
                     echo "COMPILING THE CODE"
+                    git 'https://github.com/preethid/addressbook.git'
                     sh 'mvn compile'
                 }
+                          }
             }
-
-           }
-        stage('UnitTest') {
+        stage('UNITTEST'){
             agent any
             steps {
                 script{
-                    echo "RUN THE UNIT TEST CASES"
+                    echo "RUNNING THE UNIT TEST CASES"
                     sh 'mvn test'
                 }
+             
             }
             post{
                 always{
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-
-           }
-           stage('Package and build the docker image') {
-              agent any
-            steps {
-                script{
-                    sshagent(['ssh-key']) {
-                        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                       echo "PACKAGE THE CODE"
-                    sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
-                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-script.sh'"
-                    sh "ssh ${BUILD_SERVER_IP} sudo docker build -t ${IMAGE_NAME} /home/ec2-user/addressbook"
-                    sh "ssh ${BUILD_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                    sh "ssh ${BUILD_SERVER_IP} sudo docker push ${IMAGE_NAME}"
-                }       
             }
+        stage('PACKAGE+BUILD DOCKER IMAGE ON BUILD SERVER'){
+            agent any
+           steps{
+            script{
+            sshagent(['DEV_SERVER_KEY']) {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                     echo "PACKAGING THE CODE"
+                     sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER_IP}:/home/ec2-user"
+                     sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER_IP} 'bash ~/server-script.sh'"
+                     sh "ssh ${DEV_SERVER_IP} sudo docker build -t  ${IMAGE_NAME} /home/ec2-user/addressbook"
+                    sh "ssh ${DEV_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                    sh "ssh ${DEV_SERVER_IP} sudo docker push ${IMAGE_NAME}"
+                    }
+                    }
                 }
-           }
-    }
-    //   stage('Deploy the docker image'){
-    //   agent any 
-    //    steps{
-    //     script{
-    //         sshagent(['ssh-key']) {
-    //          withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-    //             sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-    //             sh "ssh   ${DEPLOY_SERVER_IP} sudo systemctl start docker"
-    //                 sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-    //                 sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}"
-            
-
-    //     }
-    //    }
-    //     }
-    //    }
-    // }
-      stage('Deploy on K8s'){
-      agent any 
-       steps{
-        script{
-            echo "Run the app on k8s cluster"
-            sh 'envsubst < java-mvn-app.yml | sudo /usr/local/bin/kubectl apply -f -'
-            sh 'cat java-mvn-app.yml'
+            }
         }
-       }
+        stage("Provision deploy server with TF"){
+            environment{
+             AWS_ACCESS_KEY_ID =credentials("AWS_ACCESS_KEY_ID")
+            AWS_SECRET_ACCESS_KEY=credentials("AWS_SECRET_ACCESS_KEY")
+            }
+             agent any
+                   steps{
+                       script{
+                           dir('terraform'){
+                           sh "terraform init"
+                           sh "terraform apply --auto-approve"
+                           EC2_PUBLIC_IP = sh(
+                            script: "terraform output ec2-ip",
+                            returnStdout: true
+                           ).trim()
+                       }
+                       }
+                   }
         }
-       }
+        stage('DEPLOY ON EC2 instance'){
+            agent any
+                steps{
+                    script{
+            echo "RUN THE APP ON ec2 instance"
+               echo "Waiting for ec2 instance to initialise"
+               sleep(time: 90, unit: "SECONDS")
+               echo "Deploying the app to ec2-instance provisioned bt TF"
+               echo "${EC2_PUBLIC_IP}"
+               sshagent(['DEV_SERVER_KEY']) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
+                      sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8080:8080 ${IMAGE_NAME}"
+                     
+                }
+            }
+            }
+                }}    
     }
+}
