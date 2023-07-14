@@ -1,46 +1,30 @@
 pipeline {
     agent any
 
-    parameters{
-        string(name:'Env',defaultValue:'Test',description:'Env to deploy')
-        booleanParam(name:'executeTests',defaultValue:true,description:'decide to run tc')
-        choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
     }
+
 
     stages {
         stage('Compile') {
             steps {
-                echo "Compile the code ${params.APPVERSION}"
+                echo "Compile the code"
+                sh 'mvn compile'
             }
         }
          stage('UnitTest') {
-            when{
-                expression{
-                    params.executeTests == true
-                }
-            }
+           
             steps {
                 echo 'Run the test cases'
+                sh 'mvn test'
             }
         }
         stage('Package') {
             steps {
-                echo "Package the code in env:${params.Env}"
-
-            }
-        }
-        stage('Deploy') {
-            input{
-                message "Provide approval for prod"
-                ok "Deploy to Prod"
-                parameters{
-                    booleanParam(name:'DEPLOYTOPROD',defaultValue:false,description:'decide to deploy on prod')
-                }
-            }
-            steps {
-                echo "Deploying the app in env:${params.Env}"
-
-
+                echo "Package the code"
+                sh 'mvn package'
             }
         }
     }
