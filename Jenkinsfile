@@ -18,7 +18,8 @@ pipeline {
         }
         stage('Package') {
             steps {
-                echo 'Package the code'
+                echo "Package the code in env:${params.Env}"
+
             }
         }
     }
