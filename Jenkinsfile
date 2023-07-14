@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters{
+        string(name:'Env',defaultValue:'Test',description:'Env to deploy')
+    }
+
     stages {
         stage('Compile') {
             steps {
