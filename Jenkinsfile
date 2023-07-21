@@ -5,7 +5,10 @@ pipeline {
         //jdk 'myjava'
         maven 'mymaven'
     }
-
+    environment{
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
+        BUILD_SERVER_IP='ec2-user@172.31.33.81'
+    }
 
     stages {
         stage('Compile') {
@@ -33,15 +36,26 @@ pipeline {
             //on slave2
             steps {
                 sshagent(['build-server-key']) {
-                  
+                  withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+    
                     echo "Package the code"
                     //sh 'mvn package'
-                    sh "scp -o StrictHostKeyChecking=no server-script.sh ec2-user@172.31.33.81:/home/ec2-user"
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.33.81 bash ~ec2-user/server-script.sh"
-                    //sh "ssh ec2-user@172.31.33.81 sudo docker build -t imagename /home/ec2-user/addressbook"
+                    sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} bash ~ec2-user/server-script.sh"
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker build -t ${IMAGE_NAME} /home/ec2-user/addressbook"
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD" 
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker push ${IMAGE_NAME}"
                 }
+                
+}
             }
         }
+        // stage('Deploy'){
+        //     agent any
+        //     steps{
+
+        //     }
+        // }
 
     }
 }
