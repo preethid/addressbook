@@ -6,7 +6,7 @@ pipeline {
     }
      environment{
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-        DEV_SERVER_IP='ec2-user@52.66.240.173'
+        DEV_SERVER_IP='ec2-user@3.108.196.9'
         APP_NAME='java-mvn-app'
     }
     stages {
@@ -45,7 +45,7 @@ pipeline {
             agent any
            steps{
             script{
-            sshagent(['DEV_SERVER_KEY']) {
+            sshagent(['DEV_SERVER']) {
         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                      echo "PACKAGING THE CODE"
                      sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER_IP}:/home/ec2-user"
@@ -86,7 +86,7 @@ pipeline {
                sleep(time: 90, unit: "SECONDS")
                echo "Deploying the app to ec2-instance provisioned bt TF"
                echo "${EC2_PUBLIC_IP}"
-               sshagent(['DEV_SERVER_KEY']) {
+               sshagent(['DEV_SERVER']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                       sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
                       sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8080:8080 ${IMAGE_NAME}"
