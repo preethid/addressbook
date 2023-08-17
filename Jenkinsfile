@@ -30,7 +30,8 @@ pipeline {
             steps {
                 script{
                     sshagent(['build-server-key'])
-                    sh "mvn package"
+                    sh "ssh 'echo package the code'"
+                    //sh "mvn package"
                 }               
            }
         }
