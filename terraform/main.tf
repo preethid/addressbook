@@ -6,7 +6,7 @@ terraform {
       backend "s3"{
         bucket="aws-infra-backend"
         key="state.tfstate"
-        region="ap-sputh-1"
+        region="ap-south-1"
       }
     }
   }
