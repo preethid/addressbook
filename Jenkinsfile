@@ -52,3 +52,5 @@ pipeline {
                 echo "Deploying to Test"
             }
         }
+    }
+}
