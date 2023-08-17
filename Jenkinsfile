@@ -4,6 +4,9 @@ pipeline {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "mymaven"
     }  
+    environment{
+        BUILD_SERVER_IP='ec2-user@172.31.42.41'
+    }
     stages {
         stage('Compile') {
             agent any
@@ -30,7 +33,9 @@ pipeline {
             steps {
                 script{
                     sshagent(['build-server-key'])
-                    sh "ssh 'echo package the code'"
+                    "echo package the code on new slave2 machine"
+                    sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-script.sh'"
                     //sh "mvn package"
                 }               
            }

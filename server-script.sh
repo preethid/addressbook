@@ -8,9 +8,8 @@ then
   git pull origin master
 else
   echo "repo is not there"
- git clone https://github.com/preethid/addressbook.git
+ git clone https://github.com/naveen9650/addressbook.git
  cd /home/ec2-user/addressbook
 fi
  mvn package
- sudo yum install docker -y
- sudo systemctl start docker
+ 
