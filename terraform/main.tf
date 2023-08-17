@@ -3,7 +3,7 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "4.48.0"
-      backend "s3"{
+      backend = "s3"{
         bucket="aws-infra-backend"
         key="state.tfstate"
         region="ap-south-1"
