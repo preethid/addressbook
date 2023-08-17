@@ -1,37 +1,53 @@
 pipeline {
-    agent any
+    agent none
+
     tools {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "mymaven"
-    }
-    parameters{
-        string(name: 'Env', defaultValue: 'Test', description: 'env to deploy')
-        booleanParam(name: 'executeTests', defaultValue: true, description: 'decide to run tc')
-        choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'])
-    }
+    }  
     stages {
-        stage('compile') {
+        stage('Compile') {
+            agent any
             steps {
-                git 'https://github.com/naveen9650/addressbook.git'
-                sh "mvn compile"
-                echo "Env to deploy: ${parms.Env}"
-            } 
+                
+                git 'https://github.com/naveen9650/addressbook.git'                
+                sh "mvn compile"    
+                           
+            }           
         }
-        stage('unit-test') {
-            when {
-                expression{
-                    params.executeTests == true
-                }
-            }
-            steps {
+        stage('UnitTest') {
+            agent any
+            steps {                
                 sh "mvn test"
             }
+            post{
+                always{
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }           
         }
         stage('package') {
+             agent {label 'linux_slave'}
+            // when{
+            //     expression{
+            //         BRANCH_NAME == 'dev' || BRANCH_NAME == 'develop'
+            //     }
+            // }
             steps {
                 sh "mvn package"
-                echo "deploy app version: ${params.APPVERSION}"
-            }
+                    
         }
-    }
-}
+        }
+        stage('Deploy'){
+            agent {label 'linux_slave'}
+            input{
+                    message "Please approve to deploy"
+                    ok "yes, to deploy"
+                    parameters{
+                        choice(name:'NEWVERSION',choices:['1.2','1.3','1.4'])
+                    }
+                }
+            steps{
+                
+                echo "Deploying to Test"
+            }
