@@ -1,6 +1,5 @@
 pipeline {
     agent none
-
     tools {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "mymaven"
@@ -11,8 +10,7 @@ pipeline {
             steps {
                 
                 git 'https://github.com/naveen9650/addressbook.git'                
-                sh "mvn compile"    
-                           
+                sh "mvn compile"                         
             }           
         }
         stage('UnitTest') {
@@ -27,16 +25,14 @@ pipeline {
             }           
         }
         stage('package') {
-             agent {label 'linux_slave'}
-            // when{
-            //     expression{
-            //         BRANCH_NAME == 'dev' || BRANCH_NAME == 'develop'
-            //     }
-            // }
+             //agent {label 'linux_slave'}
+            agent any
             steps {
-                sh "mvn package"
-                    
-        }
+                script{
+                    sshagent(['build-server-key'])
+                    sh "mvn package"
+                }               
+           }
         }
         stage('Deploy'){
             agent {label 'linux_slave'}
