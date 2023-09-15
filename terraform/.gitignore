@@ -1,5 +1,0 @@
-# local tf dir
-.terraform/*
-# tf state files
-*.tfstate
-*.tfstate.backup
