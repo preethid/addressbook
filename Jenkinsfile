@@ -34,6 +34,24 @@ pipeline{
                 }
             }
         }
+        stage('deploy'){
+            input {
+                message "select version to package"
+                ok "Yes, we should."
+                submitter "GANESH"
+                parameters {
+                   choice(name: 'NEWERSION', choices: ['1.1', '1.2', '1.3']) 
+                }
+
+                }
+            steps{
+                script{
+                    echo ("package the code")  
+                    echo "packing the code ${params.APPVERSION}"
+                }
+            }
+        }
+
 
     }
 }
