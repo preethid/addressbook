@@ -38,6 +38,11 @@ pipeline {
                 }
                
             }
+            post{
+                always{
+                    junit 'target/surefile-reports/*.xml'
+                }
+            }
         }
          stage('Package') {
             agent {label 'linux_slave'}
