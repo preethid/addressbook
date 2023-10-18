@@ -14,6 +14,7 @@ pipeline {
                 script{
                 echo ' COMPILE-Hello World'
                 echo "Compile in env: ${params.ENV}"
+                sh "mvn compile"
                 }
             }
             
@@ -27,6 +28,7 @@ pipeline {
         steps {
                 script{
                 echo 'UNIT-TESTHello World'
+                sh "mvn test"
                 }
             }
             
@@ -36,6 +38,7 @@ pipeline {
                 script{
                 echo 'PACKAGE-Hello World'
                 echo "Packaging the code version ${params.APPVERSION}"
+                sh "mvn package"
                 }
             }
             
