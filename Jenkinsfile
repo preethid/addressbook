@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
+    }
     
     parameters{ 
         string(name: 'ENV', defaultValue: 'staging', description: 'env to compile')
