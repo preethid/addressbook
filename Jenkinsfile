@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    tools{
+        jdk 'myjava'
+        maven 'mymaven'
+    }
 
     parameters{
         string(name:'Env',defaultValue:'Test',description:'env to compile')
@@ -14,6 +18,7 @@ pipeline {
                 script{
                      echo 'COMPIEL-Hello World'
                      echo "compile in env: ${params.Env}"
+                     sh "mvn compile"
                 }
                
             }
@@ -27,6 +32,7 @@ pipeline {
             steps {
                 script{
                      echo 'UNITTEST-Hello World'
+                     sh "mvn test"
                 }
                
             }
@@ -36,6 +42,7 @@ pipeline {
                 script{
                      echo 'PACKAGE-Hello World'
                      echo "Packaging the code version ${params.APPVERSION}"
+                     sh "mvn package"
                 }
                
             }
