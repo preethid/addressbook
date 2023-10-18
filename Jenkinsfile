@@ -1,5 +1,6 @@
 pipeline {
     agent none
+
     tools{
         jdk 'myjava'
         maven 'mymaven'
@@ -10,6 +11,10 @@ pipeline {
         booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
 
+    }
+
+    environment{
+        DEV_SERVER='ec2-user@172.31.33.206'
     }
 
     stages {
@@ -25,7 +30,7 @@ pipeline {
             }
         }
          stage('UnitTest') {
-            agent any
+            agent {label 'linux_slave'}
             when{
                 expression{
                     params.executeTests == true
@@ -45,16 +50,19 @@ pipeline {
             }
         }
          stage('Package') {
-            agent {label 'linux_slave'}
+            agent any
             steps {
                 script{
+                     sshagent(['aws-key']) {
                      echo 'PACKAGE-Hello World'
                      echo "Packaging the code version ${params.APPVERSION}"
-                     sh "mvn package"
+                    sh "scp -o StrictHostKeyChecking=no server-config.sh ${DEV_SERVER}:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh'"
                 }
                
             }
         }
+         }
         stage('Deploy') {
             agent any
             input{
