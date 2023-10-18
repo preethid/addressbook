@@ -45,7 +45,7 @@ stage('Deploy') {
         message "select the version to deploy"
         ok "Version selected"
         parameters{
-            choice(name: 'NEWVERSION', choices['3.4','3.5','3.6'])
+            choice(name: 'NEWVERSION', choices: ['3.4','3.5','3.6'])
         }
 
     }
