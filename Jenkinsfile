@@ -28,8 +28,7 @@ environment{
             
         }
          stage('UnitTest') {
-            agent{label 'linux_slave2'}
-            agent any
+            agent{label 'linux_slave2'}            
          when {
             expression{
                 params.executeTests == true
