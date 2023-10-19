@@ -12,6 +12,9 @@ pipeline {
 
          }
 
+environment{
+    DEV_SERVER='ec2-user@172.31.10.12'
+}
     stages {
         stage('compile') {
             agent any
@@ -25,6 +28,7 @@ pipeline {
             
         }
          stage('UnitTest') {
+            agent{label 'linux_slave2'}
             agent any
          when {
             expression{
@@ -45,16 +49,19 @@ pipeline {
             
         }
          stage('package') {
-            agent{label 'linux_slave2'}
+            agent any
             steps {
                 script{
+                sshagent(['aws-key']) {
                 echo 'PACKAGE-Hello World'
                 echo "Packaging the code version ${params.APPVERSION}"
-                sh "mvn package"
+                sh "scp -o StrictHostKeyChecking=no scp server-config.sh ${DEV_SERVER}:/home/ec2-user"
+                sh "scp -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh"
                 }
             }
             
         }
+         }
 stage('Deploy') {
     agent any
     input{
