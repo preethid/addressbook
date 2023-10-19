@@ -55,7 +55,7 @@ environment{
                 echo 'PACKAGE-Hello World'
                 echo "Packaging the code version ${params.APPVERSION}"
                 sh "scp -o StrictHostKeyChecking=no scp server-config.sh ${DEV_SERVER}:/home/ec2-user"
-                sh "scp -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh"
+                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh"
                 }
             }
             
