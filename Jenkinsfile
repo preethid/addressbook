@@ -4,96 +4,81 @@ pipeline {
         jdk 'myjava'
         maven 'mymaven'
     }
-     environment{
-        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-        DEV_SERVER_IP='ec2-user@13.233.245.74'
-        APP_NAME='java-mvn-app'
-    }
+    
+    parameters{ 
+        string(name: 'ENV', defaultValue: 'staging', description: 'env to compile')
+        booleanParam(name: 'executeTests', defaultValue: true, description: 'decide to rum tc')
+        choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'], description: 'Pick something')
+
+         }
+
+environment{
+    DEV_SERVER='ec2-user@172.31.10.12'
+}
     stages {
-        stage('COMPILE') {
+        stage('compile') {
             agent any
-            tools{
-        jdk 'myjava'
-        maven 'mymaven'
+            steps {
+                script{
+                echo ' COMPILE-Hello World'
+                echo "Compile in env: ${params.ENV}"
+                sh "mvn compile"
+                }
+            }
+            
+        }
+         stage('UnitTest') {
+            agent{label 'linux_slave2'}            
+         when {
+            expression{
+                params.executeTests == true
+            }
+         }        
+        steps {
+                script{
+                echo 'UNIT-TESTHello World'
+                sh "mvn test"
+                }
+            }
+          post{
+            always{
+              junit 'target/surefire-reports/*.xml'  
+            }
+          }  
+            
+        }
+         stage('package') {
+            agent any
+            steps {
+                script{
+                sshagent(['aws-key']) {
+                echo 'PACKAGE-Hello World'
+                echo "Packaging the code version ${params.APPVERSION}"
+                sh "scp -o StrictHostKeyChecking=no server-config.sh ${DEV_SERVER}:/home/ec2-user"
+                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh'"
+                }
+            }
+            
+        }
+         }
+stage('Deploy') {
+    agent any
+    input{
+        message "select the version to deploy"
+        ok "Version selected"
+        parameters{
+            choice(name: 'NEWVERSION', choices: ['3.4','3.5','3.6'])
+        }
+
     }
             steps {
                 script{
-                    echo "COMPILING THE CODE"
-                    git 'https://github.com/preethid/addressbook.git'
-                    tool name: 'mymaven', type: 'maven'
-                    
-                    sh 'mvn compile'
-                }
-                          }
-            }
-        stage('UNITTEST'){
-            agent any
-            steps {
-                script{
-                    echo "RUNNING THE UNIT TEST CASES"
-                    sh 'mvn test'
-                }
-             
-            }
-            post{
-                always{
-                    junit 'target/surefire-reports/*.xml'
+                echo 'Deploy the app'                
                 }
             }
-            }
-        stage('PACKAGE+BUILD DOCKER IMAGE ON BUILD SERVER'){
-            agent any
-           steps{
-            script{
-            sshagent(['DEV_SERVER']) {
-        withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                     echo "PACKAGING THE CODE"
-                     sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER_IP}:/home/ec2-user"
-                     sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER_IP} 'bash ~/server-script.sh'"
-                     sh "ssh ${DEV_SERVER_IP} sudo docker build -t  ${IMAGE_NAME} /home/ec2-user/addressbook"
-                    sh "ssh ${DEV_SERVER_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                    sh "ssh ${DEV_SERVER_IP} sudo docker push ${IMAGE_NAME}"
-                    }
-                    }
-                }
-            }
+            
         }
-        stage("Provision deploy server with TF"){
-            environment{
-             AWS_ACCESS_KEY_ID =credentials("AWS_ACCESS_KEY_ID")
-            AWS_SECRET_ACCESS_KEY=credentials("AWS_SECRET_ACCESS_KEY")
-            }
-             agent any
-                   steps{
-                       script{
-                           dir('terraform'){
-                           sh "terraform init"
-                           sh "terraform apply --auto-approve"
-                           EC2_PUBLIC_IP = sh(
-                            script: "terraform output ip",
-                            returnStdout: true
-                           ).trim()
-                       }
-                       }
-                   }
-        }
-        stage('DEPLOY ON EC2 instance'){
-            agent any
-                steps{
-                    script{
-            echo "RUN THE APP ON ec2 instance"
-               echo "Waiting for ec2 instance to initialise"
-               sleep(time: 90, unit: "SECONDS")
-               echo "Deploying the app to ec2-instance provisioned bt TF"
-               echo "${EC2_PUBLIC_IP}"
-               sshagent(['DEV_SERVER']) {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                      sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8080:8080 ${IMAGE_NAME}"
-                     
-                }
-            }
-            }
-                }}    
+
+
     }
 }
