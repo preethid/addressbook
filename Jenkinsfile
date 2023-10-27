@@ -14,7 +14,9 @@ pipeline {
     }
 
     environment{
-        DEV_SERVER='ec2-user@172.31.33.206'
+        DEV_SERVER='ec2-user@172.31.42.2'
+        DEPLOY_SERVER='ec2-user@172.31.14.64'
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
     }
 
     stages {
@@ -30,7 +32,8 @@ pipeline {
             }
         }
          stage('UnitTest') {
-            agent {label 'linux_slave'}
+            //agent {label 'linux_slave'}
+            agent any
             when{
                 expression{
                     params.executeTests == true
@@ -54,12 +57,15 @@ pipeline {
             steps {
                 script{
                      sshagent(['aws-key']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'dockerpassword', usernameVariable: 'dockeruser')]) {
                      echo 'PACKAGE-Hello World'
                      echo "Packaging the code version ${params.APPVERSION}"
                     sh "scp -o StrictHostKeyChecking=no server-config.sh ${DEV_SERVER}:/home/ec2-user"
-                    sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh'"
+                    sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash ~/server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
+                    sh "ssh ${DEV_SERVER} sudo docker login -u ${dockeruser} -p ${dockerpassword}"
+                    sh "ssh ${DEV_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
-               
+                     }
             }
         }
          }
@@ -74,13 +80,19 @@ pipeline {
             }
             steps {
                 script{
+                     sshagent(['aws-key']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'dockerpassword', usernameVariable: 'dockeruser')]) {
                      echo 'Deploy the app'
-                     
+                     sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
+                     sh "ssh  ${DEPLOY_SERVER} sudo systemctl start docker"
+                     sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${dockeruser} -p ${dockerpassword}"
+                    sh "ssh  ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
-               
+                     }
             }
         }
 
     }
 
+    }
 }
