@@ -40,8 +40,8 @@ pipeline {
         input {
             message "select the version to deploy"
             ok "version selected"
-            Parameters{
-                choice(name:'newversion', choices['1', '2', '3'])
+            parameters  {
+                choice(name: 'newversion', choices: ['1', '2', '3'])
             }
         }
             steps {
