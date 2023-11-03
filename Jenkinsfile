@@ -36,5 +36,21 @@ pipeline {
                 }
             }
         }
+     stage('deploy') {
+        input {
+            message "select the version to deploy"
+            ok "version selected"
+            Parameters{
+                choice(name:'newversion', choices['1', '2', '3'])
+            }
+        }
+            steps {
+                script {
+                    echo 'deploy the app'
+                   
+                }
+            }
+        }
+
     }
 }
