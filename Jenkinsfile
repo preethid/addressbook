@@ -5,22 +5,23 @@ pipeline {
         stage('compile') {
             steps {
                 script {
-                echo 'compile the code'
+                    echo 'compile the code'
+                }
             }
         }
-    }
-           stage('unit test') {
+        stage('unit test') {
             steps {
                 script {
-                echo 'test the code'
+                    echo 'test the code'
+                }
             }
         }
-               stage('package') {
+        stage('package') {
             steps {
                 script {
-                echo 'package the code'
+                    echo 'package the code'
+                }
             }
         }
-    
     }
 }
