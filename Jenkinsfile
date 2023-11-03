@@ -18,8 +18,8 @@ pipeline {
         }
         stage('unit test') {
             when {
-                expressions{
-                    params.executeTests == true
+                expression {
+                    params.ExecuteTests == true
                 }
             }
             steps {
