@@ -3,8 +3,8 @@ pipeline {
     
     parameters{
         string(name:'roshu' ,defaultValue:'Test' ,description: 'version to deploy')
-        booleanParam(name: 'Laxman', defaultValue: true, description: 'head of the family')
-        choice(name: 'shiva', choices: ['manadev', 'nandi', 'parvathi'] )
+        booleanParam(name: 'ExecuteTest', defaultValue: true, description: 'head of the family')
+        choice(name: 'appversion', choices: ['manadev', 'nandi', 'parvathi'] )
     }
 
     stages {
@@ -19,7 +19,7 @@ pipeline {
         stage('unit test') {
             when {
                 expressions{
-                    params.Laxman == true
+                    params.executeTests == true
                 }
             }
             steps {
