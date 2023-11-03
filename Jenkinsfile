@@ -3,7 +3,7 @@ pipeline {
     
     parameters{
         string(name:'roshu' ,defaultValue:'Test' ,description: 'version to deploy')
-        boolean(name: 'Laxman', defaultValue: true, description: 'head of the family')
+        booleanParam(name: 'Laxman', defaultValue: true, description: 'head of the family')
         choice(name: 'shiva', choices: ['manadev', 'nandi', 'parvathi'] )
     }
 
