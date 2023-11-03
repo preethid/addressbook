@@ -3,6 +3,8 @@ pipeline {
     
     parameters{
         string(name:'roshu' ,defaultValue:'Test' ,description: 'version to deploy')
+        boolean(name: 'Laxman', defaultValue: true, description: 'head of the family')
+        choice(name: 'shiva', choices: ['manadev', 'nandi', 'parvathi'] )
     }
 
     stages {
@@ -15,6 +17,11 @@ pipeline {
             }
         }
         stage('unit test') {
+            when {
+                expressions{
+                    params.Laxman == true
+                }
+            }
             steps {
                 script {
                     echo 'test the code'
@@ -25,6 +32,7 @@ pipeline {
             steps {
                 script {
                     echo 'package the code'
+                    echo "packaging the code versio ${params.shiva}"
                 }
             }
         }
