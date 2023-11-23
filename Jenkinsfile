@@ -12,7 +12,7 @@ pipeline {
         stage('Compile') {
             steps {
                 echo 'Compiling the code'
-                echo 'Compiling in ${params.Env}'
+                echo "Compiling in ${params.Env}"
             }
         }
         stage('UnitTest') {
