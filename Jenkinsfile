@@ -37,10 +37,10 @@ pipeline {
         }
         stage('Package') {
             input{
-                message "Select the version to package"
-                ok "Version selected"
+                message "SELECT THE ENVIRONMENT TO DEPLOY"
+                ok "DEPLOY"
                 parameters{
-                    choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
+                    choice(name:'NEWAPP',choices:['ONPREM','EKS','EC2'])
 
             }
 
