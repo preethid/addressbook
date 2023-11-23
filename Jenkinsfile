@@ -38,10 +38,13 @@ pipeline {
             }
         }
         stage('Package') {
-             agent {
-                // Specify the label or name of the Jenkins agent (slave node) where you want to run the package stage
-                label 'linux_slave'
-            }
+            //  agent {
+            //     // Specify the label or name of the Jenkins agent (slave node) where you want to run the package stage
+            //     label 'linux_slave'
+            // }
+
+            agent any
+            
             input{
                 message "SELECT THE ENVIRONMENT TO DEPLOY"
                 ok "DEPLOY"
@@ -51,10 +54,18 @@ pipeline {
             }
 
             }
-            steps {
-                echo 'Packaging the code'
-                echo "Packaging version ${params.APPVERSION}"
-                sh 'mvn package'
+            steps{
+            script{
+                sshagent(['deploy-server']) {
+                    echo "Packaging the code"
+                    sh "scp server-script.sh -o StrictHostKeyChecking=no ec2-user@172.31.37.128:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.37.128 'bash ~/server-config.sh'"  # ssh 'user1@172.31.42.100'
+                    // sh 'mvn package'
+                    // sh "ssh "
+                   
+                    
+                }
+            }
             }
         }
     }
