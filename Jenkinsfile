@@ -33,6 +33,8 @@ pipeline {
                     choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
 
             }
+
+            }
             steps {
                 echo 'Packaging the code'
                 echo "Packaging version ${params.APPVERSION}"
