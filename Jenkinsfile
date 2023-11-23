@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
     tools{
         jdk 'myjava'
         maven 'mymaven'
@@ -13,6 +13,7 @@ pipeline {
 
     stages {
         stage('Compile') {
+            agent any
             steps {
                 echo 'Compiling the code'
                 echo "Compiling in ${params.Env}"
@@ -20,6 +21,7 @@ pipeline {
             }
         }
         stage('UnitTest') {
+            agent any
             when{
                 expression{
                     params.executeTests == true
@@ -36,6 +38,10 @@ pipeline {
             }
         }
         stage('Package') {
+             agent {
+                // Specify the label or name of the Jenkins agent (slave node) where you want to run the package stage
+                label 'linux_slave'
+            }
             input{
                 message "Select the version to package"
                 ok "Version selected"
