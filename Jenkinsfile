@@ -10,6 +10,10 @@ pipeline {
         booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
     }
+    environment{
+        BUILD_SERVER_IP='ec2-user@172.31.46.168'
+        DEPLOY_SERVER_IP='ec2-user@172.31.46.239'
+    }
 
     stages {
         stage('Compile') {
@@ -37,7 +41,7 @@ pipeline {
                 }
             }
         }
-        stage('Package') {
+        stage('DOCKER_BUILD') {
             //  agent {
             //     // Specify the label or name of the Jenkins agent (slave node) where you want to run the package stage
             //     label 'linux_slave'
@@ -56,10 +60,12 @@ pipeline {
             }
             steps{
             script{
-                sshagent(['deploy-server']) {
+                sshagent(['build-server']) {
                     echo "Packaging the code"
-                    sh "scp -o StrictHostKeyChecking=no server-config.sh  ec2-user@172.31.11.212:/home/ec2-user"
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.11.212 'bash ~/server-config.sh'"  
+                    sh "scp -o StrictHostKeyChecking=no server-config.sh  ${BUILD_SERVER_IP}:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-config.sh'"  
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker login -u devopstrainer -p password"
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker push image"
                     // sh 'mvn package'
                     // sh "ssh "
                    
@@ -67,6 +73,21 @@ pipeline {
                 }
             }
             }
+        }
+
+        stage('DEPLOY ON TEST SERVER'){
+            agent any
+            steps{
+                script{
+                    sshagent(['build-server']) {
+                       sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
+                sh "ssh  ${DEPLOY_SERVER_IP} sudo systemctl start docker"
+                sh "ssh  ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                sh "ssh  ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+
+                }
+            }
+
         }
     }
 }
