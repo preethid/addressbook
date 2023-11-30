@@ -13,6 +13,7 @@ pipeline {
     environment{
         BUILD_SERVER_IP='ec2-user@172.31.46.168'
         DEPLOY_SERVER_IP='ec2-user@172.31.46.239'
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
     }
 
     stages {
@@ -64,7 +65,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     echo "Packaging the code"
                     sh "scp -o StrictHostKeyChecking=no server-config.sh  ${BUILD_SERVER_IP}:/home/ec2-user"
-                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-config.sh'"  
+                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"  
                     sh "ssh ${BUILD_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                     sh "ssh ${BUILD_SERVER_IP} sudo docker push image"
                     // sh 'mvn package'
