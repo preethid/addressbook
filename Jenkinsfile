@@ -61,10 +61,11 @@ pipeline {
             steps{
             script{
                 sshagent(['build-server']) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     echo "Packaging the code"
                     sh "scp -o StrictHostKeyChecking=no server-config.sh  ${BUILD_SERVER_IP}:/home/ec2-user"
                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-config.sh'"  
-                    sh "ssh ${BUILD_SERVER_IP} sudo docker login -u devopstrainer -p password"
+                    sh "ssh ${BUILD_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                     sh "ssh ${BUILD_SERVER_IP} sudo docker push image"
                     // sh 'mvn package'
                     // sh "ssh "
@@ -74,13 +75,14 @@ pipeline {
             }
             }
         }
-
+        }
         stage('DEPLOY ON TEST SERVER'){
             agent any
             steps{
                 script{
-                    sshagent(['build-server']) {
-                       sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
+                sshagent(['build-server']) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                sh "ssh  -o StrictHostKeyChecking=no ${DEPLOY_SERVER_IP} sudo yum install docker -y"
                 sh "ssh  ${DEPLOY_SERVER_IP} sudo systemctl start docker"
                 sh "ssh  ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                 sh "ssh  ${DEPLOY_SERVER_IP} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -89,6 +91,8 @@ pipeline {
             }
 
         }
+    }
+}
     }
 }
 
