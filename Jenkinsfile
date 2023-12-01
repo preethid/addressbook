@@ -75,6 +75,7 @@ pipeline {
                     choice(name:'NEWAPP',choices:['ONPREM','EKS','EC2'])
 
             }
+             }
             steps{
                 script{
                 sshagent(['build-server']) {
