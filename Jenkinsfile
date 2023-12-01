@@ -48,17 +48,8 @@ pipeline {
             //     label 'linux_slave'
             // }
 
-            agent any
-            
-            input{
-                message "SELECT THE ENVIRONMENT TO DEPLOY"
-                ok "DEPLOY"
-                parameters{
-                    choice(name:'NEWAPP',choices:['ONPREM','EKS','EC2'])
-
-            }
-
-            }
+            agent any       
+           
             steps{
             script{
                 sshagent(['build-server']) {
@@ -68,9 +59,7 @@ pipeline {
                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER_IP} 'bash ~/server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"  
                     sh "ssh ${BUILD_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                     sh "ssh ${BUILD_SERVER_IP} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
-                    // sh 'mvn package'
-                    // sh "ssh "
-                   
+                                   
                     
                 }
             }
@@ -79,6 +68,13 @@ pipeline {
         }
         stage('DEPLOY ON TEST SERVER'){
             agent any
+             input{
+                message "SELECT THE ENVIRONMENT TO DEPLOY"
+                ok "DEPLOY"
+                parameters{
+                    choice(name:'NEWAPP',choices:['ONPREM','EKS','EC2'])
+
+            }
             steps{
                 script{
                 sshagent(['build-server']) {
