@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    tools{
+        maven 'mymaven'
+        jdk 'myjava'
+    }
 
     parameters{
          string(name: 'ENV', defaultValue: 'DEV', description: 'env to compile')
@@ -10,10 +14,9 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-                script{
-                
-                 echo "COmpile the Code"
+                script{                
                 echo "Compiling in ${params.ENV} environment"
+                sh 'mvn compile'
             }
             }
             
@@ -27,14 +30,15 @@ pipeline {
             steps{
                 script{
                 echo "Run the Unit test cases"
+                sh 'mvn test'
             }
             }
         }
         stage("Package"){
             steps{
                 script{
-                echo "Package the Code"
                 echo "Packing the app version ${params.APPVERSION}"
+                sh 'mvn package'
                 }
             }
         }
@@ -48,7 +52,6 @@ pipeline {
             }
             steps{
                 script{
-                echo "Deploy the COde"
                 echo "Deploy the app to ${NEWAPP}"
 
                 }
