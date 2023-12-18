@@ -1,23 +1,29 @@
 pipeline {
     agent any
 
+    parameters{
+         string(name: 'ENV', defaultValue: 'DEV', description: 'env to compile')
+         booleanParam(name: 'executeTest', defaultValue: true, description: 'decide to run tc')
+         choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'], description: 'Pick app version')
+    }
+
     stages {
         stage('Compile') {
             steps {
                 script{
-                // Get some code from a GitHub repository
-                //git 'https://github.com/jglick/simple-maven-project-with-tests.git'
-
-                // Run Maven on a Unix agent.
-               // sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                
                  echo "COmpile the Code"
-                // To run Maven on a Windows agent, use
-                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                echo "Compiling in ${params.ENV} environment"
             }
             }
             
         }
         stage("UnitTest"){
+            when{
+                expression{
+                    params.executeTest == true
+                }
+            }
             steps{
                 script{
                 echo "Run the Unit test cases"
@@ -28,6 +34,7 @@ pipeline {
             steps{
                 script{
                 echo "Package the Code"
+                echo "Packing the app version ${params.APPVERSION}"
                 }
             }
         }
