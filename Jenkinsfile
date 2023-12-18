@@ -49,7 +49,7 @@ pipeline {
             steps{
                 script{
                 echo "Deploy the COde"
-                echo "Deploy the app to ${params.NEWAPP}"
+                echo "Deploy the app to ${NEWAPP}"
 
                 }
             }
