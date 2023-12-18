@@ -43,7 +43,7 @@ pipeline {
                 message "Select the version to deploy"
                 ok "Version selected"
                 parameters{
-                    choice(name:'NEWAPP',choice:['1.2','1.3','1.4'])
+                    choice(name: 'NEWAPP',choices:['1.2','1.3','1.4'])
                 }
             }
             steps{
