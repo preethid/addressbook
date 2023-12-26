@@ -14,7 +14,7 @@ pipeline {
     environment{
         BUILD_SERVER='ec2-user@172.31.40.183'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
-        DEPLOY_SERVER='ec2-user@172.31.36.141'
+        //DEPLOY_SERVER='ec2-user@172.31.36.141'
     }
 
     stages {
@@ -68,6 +68,25 @@ pipeline {
                 }
             }
         }
+        stage("Provision deploy server with TF"){
+            // environment{
+            //        AWS_ACCESS_KEY_ID =credentials("jenkins_aws_access_key_id")
+            //        AWS_SECRET_ACCESS_KEY=credentials("jenkins_aws_secret_access_key")
+            // }
+             agent any
+                   steps{
+                       script{
+                           dir('terraform'){
+                           sh "terraform init"
+                           sh "terraform apply --auto-approve"
+                           EC2_PUBLIC_IP = sh(
+                            script: "terraform output ec2-ip",
+                            returnStdout: true
+                           ).trim()
+                       }
+                       }
+                   }
+        }
         stage("Deploy"){
             agent any
             input{
@@ -84,10 +103,10 @@ pipeline {
                 echo "Deploying in ${params.ENV} environment"
                 //sh 'mvn compile'
                 
-                sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
-                sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
-                sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-                sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+                sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
 
