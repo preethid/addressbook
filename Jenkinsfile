@@ -12,7 +12,9 @@ pipeline {
     }
 
     environment{
-        BUILD_SERVER='ec2-user@172.31.34.205'
+        BUILD_SERVER='ec2-user@172.31.40.183'
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
+        DEPLOY_SERVER='ec2-user@172.31.36.141'
     }
 
     stages {
@@ -20,18 +22,17 @@ pipeline {
             agent any
             steps {
                 script{   
-            sshagent(['build-server']) {
+           // sshagent(['build-server']) {
                          
                 echo "Compiling in ${params.ENV} environment"
-                //sh 'mvn compile'
-                sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
-                sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/server-config.sh'"
-            }
+                sh 'mvn compile'
+                
+           // }
             }
             } 
         }
         stage("UnitTest"){
-            agent {label 'linux_slave'}
+            agent any
             when{
                 expression{
                     params.executeTest == true
@@ -49,12 +50,21 @@ pipeline {
                 }
             }
         }
-        stage("Package"){
+        stage("Dockerise"){
             agent any
             steps{
                 script{
-                echo "Packing the app version ${params.APPVERSION}"
-                sh 'mvn package'
+               sshagent(['build-server']) {
+               withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
+                echo "Containerising in ${params.ENV} environment"
+                //sh 'mvn compile'
+                sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+                sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
+                sh "ssh ${BUILD_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
+
+            }
+                }
                 }
             }
         }
@@ -69,7 +79,17 @@ pipeline {
             }
             steps{
                 script{
-                echo "Deploy the app to ${NEWAPP}"
+                 sshagent(['build-server']) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
+                echo "Deploying in ${params.ENV} environment"
+                //sh 'mvn compile'
+                
+                sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
+                sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
+                sh "ssh ${BUILD_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+                }
+            }
 
                 }
             }
