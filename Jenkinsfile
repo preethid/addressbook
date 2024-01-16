@@ -83,7 +83,7 @@ pipeline {
                             script: "terraform output ec2-public-ip",
                             returnStdout: true
                            ).trim()
-                           //sh "terraform destroy --auto-approve"
+                           sh "terraform destroy --auto-approve"
                        }
                        }
                    }
