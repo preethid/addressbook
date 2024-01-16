@@ -12,7 +12,7 @@ pipeline {
     }
 
     environment{
-        BUILD_SERVER='ec2-user@172.31.44.111'
+        BUILD_SERVER='ec2-user@172.31.32.218'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
         //DEPLOY_SERVER='ec2-user@172.31.36.141'
     }
@@ -83,46 +83,46 @@ pipeline {
                             script: "terraform output ec2-public-ip",
                             returnStdout: true
                            ).trim()
-                           sh "terraform destroy --auto-approve"
+                           //sh "terraform destroy --auto-approve"
                        }
                        }
                    }
         }
-        // stage("Deploy"){
-        //     agent any
-        //     input{
-        //         message "Select the version to deploy"
-        //         ok "Version selected"
-        //         parameters{
-        //             choice(name: 'NEWAPP',choices:['EKS','ONPrem','Ec2'])
-        //         }
-        //     }
-        //     steps{
-        //         script{
-        //          sshagent(['build-server']) {
-        //         withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
-        //         echo "Deploying in ${params.ENV} environment"
-        //         //sh 'mvn compile'
-                
-        //         sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
-        //         sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
-        //         sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-        //         sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}:${BUILD_NUMBER}"
-        //         }
-        //     }
-
-        //         }
-        //     }
-
-        // }
-        stage("K8s deploy"){
+        stage("Deploy"){
             agent any
-               steps{
-                script{
-                    echo "apply k8s manifest files"
-                    sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
+            input{
+                message "Select the version to deploy"
+                ok "Version selected"
+                parameters{
+                    choice(name: 'NEWAPP',choices:['EKS','ONPrem','Ec2'])
                 }
-               }
+            }
+            steps{
+                script{
+                 sshagent(['build-server']) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
+                echo "Deploying in ${params.ENV} environment"
+                //sh 'mvn compile'
+                
+                sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}:${BUILD_NUMBER}"
+                }
+            }
+
+                }
+            }
+
         }
+        // stage("K8s deploy"){
+        //     agent any
+        //        steps{
+        //         script{
+        //             echo "apply k8s manifest files"
+        //             sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
+        //         }
+        //        }
+        // }
     }
 }
