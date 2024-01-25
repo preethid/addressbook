@@ -17,15 +17,18 @@ pipeline {
             
         }
         stage('Test') {
-            steps {              
-
-                script{
+            steps {           
+              script{
                    echo "RUNNING THE TC"
                    sh "mvn test"
-                }
-               
+                }              
              
             }            
+        }
+        post{
+            always{
+                junit 'target/surefire-reports/*.xml'
+            }
         }
         stage('Package') {
             steps {              
@@ -33,8 +36,7 @@ pipeline {
                 script{
                    echo "Creating the package"
                    sh "mvn package"
-                }
-               
+                }             
              
             }            
         }
