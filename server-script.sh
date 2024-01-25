@@ -15,5 +15,4 @@ else
    git checkout test
 fi
 
-cd addressbook
 mvn package
