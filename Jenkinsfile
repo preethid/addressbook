@@ -5,12 +5,12 @@ pipeline {
         jdk 'myjava'
     }
 
+
     parameters{
          string(name: 'ENV', defaultValue: 'DEV', description: 'env to compile')
          booleanParam(name: 'executeTest', defaultValue: true, description: 'decide to run tc')
          choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'], description: 'Pick app version')
     }
-
     environment{
         BUILD_SERVER='ec2-user@172.31.32.218'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
@@ -102,7 +102,6 @@ pipeline {
                  sshagent(['build-server']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
                 echo "Deploying in ${params.ENV} environment"
-                //sh 'mvn compile'
                 
                 sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
                 sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
