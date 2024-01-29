@@ -21,8 +21,7 @@ pipeline {
         stage('Compile') {
             agent any
             steps {
-                script{   
-           // sshagent(['build-server']) {
+                script{ 
                          
                 echo "Compiling in ${params.ENV} environment"
                 sh 'mvn compile'
