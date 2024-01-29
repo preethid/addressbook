@@ -115,14 +115,6 @@ pipeline {
             }
 
         }
-        // stage("K8s deploy"){
-        //     agent any
-        //        steps{
-        //         script{
-        //             echo "apply k8s manifest files"
-        //             sh 'envsubst < java-mvn-app.yml | kubectl apply -f -'
-        //         }
-        //        }
-        // }
+        
     }
 }
