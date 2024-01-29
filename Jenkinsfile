@@ -10,13 +10,11 @@ pipeline {
          booleanParam(name: 'executeTest', defaultValue: true, description: 'decide to run tc')
          choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'], description: 'Pick app version')
     }
-
     environment{
         BUILD_SERVER='ec2-user@172.31.32.218'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
         //DEPLOY_SERVER='ec2-user@172.31.36.141'
     }
-
     stages {
         stage('Compile') {
             agent any
