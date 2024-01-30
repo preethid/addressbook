@@ -15,7 +15,7 @@ spec:
         app: java-maven-app
     spec:
       imagePullSecrets:
-      - name: my-registry-key
+      - name: aws-key
       containers:
       - name: sample-ctr
         image: devopstrainer/java-mvn-privaterepos:2
