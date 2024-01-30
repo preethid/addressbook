@@ -15,6 +15,7 @@ pipeline {
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
         
     }
+    
     stages {
         stage('Compile') {
             agent any
