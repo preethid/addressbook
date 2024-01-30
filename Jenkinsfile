@@ -37,9 +37,15 @@ pipeline {
             agent any
             steps {
                 script{
+                    sshagent(['Jenkins_Slave2_SSh_Key']) {
+                        sh "scp -o StrictHostKeyChecking=no Jenkins_Slave2_Config.sh ec2-user@172.31.83.91:/home/ec2-user"
+                        sh "scp -o StrictHostKeyChecking=no ec2-user@172.31.83.91 'bash Jenkins_Slave2_Config.sh'"
                     // Run Maven on a Unix agent.
                     echo "Creating war file in this stage."
                     sh "mvn package"
+                              
+                    }
+                    
 
                 }
             }
