@@ -5,7 +5,6 @@ pipeline {
         jdk 'myjava'
     }
 
-
     parameters{
          string(name: 'ENV', defaultValue: 'DEV', description: 'env to compile')
          booleanParam(name: 'executeTest', defaultValue: true, description: 'decide to run tc')
