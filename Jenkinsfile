@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
 
 
     tools {
@@ -7,6 +7,7 @@ pipeline {
         maven "maven"
     }
     stages {
+        agent {label "Jenkins_Node1"}
         stage('compile') {
             steps {
                 script{
@@ -18,6 +19,7 @@ pipeline {
             }
         }
         stage('test') {
+            agent any
             steps {
                 script{
                     // Run Maven on a Unix agent.
@@ -32,6 +34,7 @@ pipeline {
             }
         }
         stage('Package') {
+            agent any
             steps {
                 script{
                     // Run Maven on a Unix agent.
