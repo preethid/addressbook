@@ -5,6 +5,7 @@ pipeline {
         jdk 'myjava'
     }
 
+
     parameters{
          string(name: 'ENV', defaultValue: 'DEV', description: 'env to compile')
          booleanParam(name: 'executeTest', defaultValue: true, description: 'decide to run tc')
@@ -20,8 +21,7 @@ pipeline {
         stage('Compile') {
             agent any
             steps {
-                script{   
-           // sshagent(['build-server']) {
+                script{ 
                          
                 echo "Compiling in ${params.ENV} environment"
                 sh 'mvn compile'
@@ -101,7 +101,6 @@ pipeline {
                  sshagent(['build-server']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {          
                 echo "Deploying in ${params.ENV} environment"
-                //sh 'mvn compile'
                 
                 sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
                 sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
