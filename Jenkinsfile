@@ -23,12 +23,14 @@ pipeline {
                     // Run Maven on a Unix agent.
                     echo "Testing the code in this stage."
                     sh "mvn test"
-
+                }            
+            }
+            post{ 
+                always{
+                    junit 'target/surefire-reports/*.xml'
                 }
-                
             }
         }
-        
         stage('Package') {
             steps {
                 script{
@@ -37,7 +39,6 @@ pipeline {
                     sh "mvn package"
 
                 }
-                
             }
         }
     }
