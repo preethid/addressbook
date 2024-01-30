@@ -7,8 +7,8 @@ pipeline {
         maven "maven"
     }
     stages {
-        agent {label "Jenkins_Node1"}
         stage('compile') {
+            agent {label "Jenkins_Node1"}
             steps {
                 script{
 
@@ -18,7 +18,7 @@ pipeline {
                 }               
             }
         }
-        stage('test') {
+        stage('test') {  
             agent any
             steps {
                 script{
