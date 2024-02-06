@@ -22,11 +22,12 @@ pipeline {
                 }               
             }
         }
+
         stage('test') {  
             agent any
             steps {
                 script{
-                    // Run Maven on a Unix agent.
+        
                     echo "Testing the code in this stage."
                     sh "mvn test"
                 }            
