@@ -48,8 +48,8 @@ pipeline {
                         sh "ssh ${BUILD_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password'}"
                         sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                     // Run Maven on a Unix agent.
-                    echo "Creating war file in this stage."
-                    sh "mvn package"
+                    //echo "Creating war file in this stage."
+                    //sh "mvn package"
                               
                     }
                     }   
