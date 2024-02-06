@@ -7,13 +7,13 @@ pipeline {
         maven "maven"
     }
     environment{
-        BUILD_SERVER='ec2-user/@172.31.83.91'
+        BUILD_SERVER='ec2-user@172.31.83.91'
         IMAGE_NAME='vikranth2009/java-mvn-privaterepos'
     }
     stages {
         stage('compile') {
-            //agent {label "Jenkins_Node1"}
-            agent any
+            agent {label "Jenkins_Node1"}
+            //agent any
             steps {
                 script{
 
