@@ -12,11 +12,13 @@ pipeline {
     }
     stages {
         stage('compile') {
-            agent {label "Jenkins_Node1"}
+            //agent {label "Jenkins_Node1"}
+            agent any
             steps {
                 script{
 
                     // Run Maven on a Unix agent.
+                    git 'https://github.com/chandra-kovvuri/addressbook.git'
                     echo "Compiling the code in this stage"
                     sh "mvn compile"
                 }               
@@ -44,6 +46,7 @@ pipeline {
                 script{
                     sshagent(['Jenkins_Slave2_SSh_Key']) {
                         withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
+                        //sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         sh "scp -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash containerise-docker-build.sh ${BUILD_SERVER} ${BUILD_NUMBER}'"
                         sh "ssh ${BUILD_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password}"
