@@ -48,7 +48,8 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
                         //sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
-                        sh "scp -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
+                        //sh "scp -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
+                        sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"   
                         sh "ssh ${BUILD_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password}"
                         sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                     // Run Maven on a Unix agent.
