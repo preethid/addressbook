@@ -51,11 +51,8 @@ pipeline {
                         sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         //sh "scp -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
                         sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"   
-                        sh "ssh ${BUILD_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password}"
+                        sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-jenkins-credentials}' -p '${docker-hub-jenkins-password}'"
                         sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
-                    // Run Maven on a Unix agent.
-                    //echo "Creating war file in this stage."
-                    //sh "mvn package"
                               
                     }
                     }   
@@ -68,11 +65,11 @@ pipeline {
             steps{
                 script{
                     sshagent(['Jenkins_Slave2_SSh_Key']) {
-                        
+
                         withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
                         sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
                         sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
-                        sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password}"
+                         sh "ssh ${DEPLOY_SERVER} sudo docker login -u '${docker-hub-jenkins-credentials}' -p '${docker-hub-jenkins-password}'"
                         sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME} ${BUILD_NUMBER}"
 
                        }   
