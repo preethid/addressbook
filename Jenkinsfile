@@ -9,6 +9,7 @@ pipeline {
     environment{
         BUILD_SERVER='ec2-user@172.31.83.91'
         IMAGE_NAME='vikranth2009/java-mvn-privaterepos'
+        DEPLOY_SERVER='ec2-user@172.31.39.67'
     }
     stages {
         stage('compile') {
@@ -61,6 +62,26 @@ pipeline {
 
                 }
             }
+        }
+        stage ('Deploy the docker container'){
+            agent any
+            steps{
+                script{
+                    sshagent(['Jenkins_Slave2_SSh_Key']){
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
+                        sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
+                        sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo systemctl start docker"
+                        sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${docker-hub-jenkins-credentials} -p ${docker-hub-jenkins-password}"
+                        sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME} ${BUILD_NUMBER}"
+
+                    }    
+
+                }
+
+                }
+                
+            }
+
         }
     }
 }
