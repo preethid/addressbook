@@ -8,7 +8,7 @@ pipeline {
     }
     environment{
         BUILD_SERVER='ec2-user@172.31.83.91'
-        IMAGE_NAME='vikranth2009/java-mvn-privaterepos'
+        IMAGE_NAME='vikranth2009/devops-learning'ß
         DEPLOY_SERVER='ec2-user@172.31.39.67'
     }
     stages {
