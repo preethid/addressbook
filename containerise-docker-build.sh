@@ -12,7 +12,7 @@ then
   git pull origin master
 else
   git clone https://github.com/chandra-kovvuri/addressbook.git
+   cd /home/ec2-user/addressbook
+   git checkout master
 fi
- cd /home/ec2-user/addressbook
- git checkout master
 sudo docker build -t $1:$2 /home/ec2-user/addressbook
