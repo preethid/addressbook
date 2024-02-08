@@ -46,12 +46,12 @@ pipeline {
             steps {
                 script{
                     sshagent(['Jenkins_Slave2_SSh_Key']) {
-                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-password', usernameVariable: 'docker-hub-username')]) {
                         //sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         //sh "scp -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
                         sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"   
-                        sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-jenkins-credentials}' -p '${docker-hub-jenkins-password}'"
+                        sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-username}' -p '${docker-hub-password}'"
                         sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                               
                     }
@@ -69,7 +69,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-jenkins-password', usernameVariable: 'docker-hub-jenkins-credentials')]) {
                         sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} sudo yum install docker -y"
                         sh "ssh ${BUILD_SERVER} sudo systemctl start docker"
-                         sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-jenkins-credentials}' -p '${docker-hub-jenkins-password}'"
+                        sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-username}' -p '${docker-hub-password}'"
                         sh "ssh ${BUILD_SERVER} sudo docker run -itd -P ${IMAGE_NAME} ${BUILD_NUMBER}"
 
                        }   
