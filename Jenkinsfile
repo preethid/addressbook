@@ -7,7 +7,7 @@ pipeline {
         maven "maven"
     }
     environment{
-        BUILD_SERVER='ec2-user@172.31.39.67'
+        BUILD_SERVER='ec2-user@172.31.92.116'
         IMAGE_NAME='vikranth2009/devops-learning'
         DEPLOY_SERVER='ec2-user@172.31.39.67'
     }
