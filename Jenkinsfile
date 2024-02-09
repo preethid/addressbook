@@ -7,7 +7,7 @@ pipeline {
         maven "maven"
     }
     environment{
-        BUILD_SERVER='ec2-user@172.31.83.91'
+        BUILD_SERVER='ec2-user@172.31.39.67'
         IMAGE_NAME='vikranth2009/devops-learning'
         DEPLOY_SERVER='ec2-user@172.31.39.67'
     }
@@ -46,7 +46,7 @@ pipeline {
             steps {
                 script{
                     sshagent(['Jenkins_Slave2_SSh_Key']) {
-                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-password', usernameVariable: 'docker-hub-username')]) {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-password1', usernameVariable: 'docker-hub-username1')]) {   
                         sh "scp -o StrictHostKeyChecking=no containerise-docker-build.sh ${BUILD_SERVER}:/home/ec2-user"
                         sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash ~/containerise-docker-build.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"   
                         sh "ssh ${BUILD_SERVER} sudo docker login -u ${docker-hub-username} -p ${docker-hub-password}"
@@ -64,7 +64,7 @@ pipeline {
                 script{
                     sshagent(['Jenkins_Slave2_SSh_Key']) {
 
-                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-password', usernameVariable: 'docker-hub-username')]) {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-Jenkins-Credentials', passwordVariable: 'docker-hub-password1', usernameVariable: 'docker-hub-username1')]) {    
                         sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} sudo yum install docker -y"
                         sh "ssh ${BUILD_SERVER} sudo systemctl start docker"
                         sh "ssh ${BUILD_SERVER} sudo docker login -u '${docker-hub-username}' -p '${docker-hub-password}'"
