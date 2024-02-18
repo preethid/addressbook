@@ -23,7 +23,7 @@ pipeline {
 
             
         }
-        stage('UnitTest') { // running on slave2 via ssh-agent
+        stage('UnitTest') { // running on slave1
             agent {label 'linux_slave'}
             steps {
                 script{
@@ -39,7 +39,7 @@ pipeline {
             }
             
         }
-        stage('Package') {
+        stage('Package') { // running on slave2 via ssh-agent
             agent any
             steps {
                 script{
