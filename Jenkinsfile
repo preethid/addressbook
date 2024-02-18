@@ -6,6 +6,10 @@ pipeline {
         maven "mymaven"
     }
 
+    environment{
+        BUILD_SERVER='ec2-user@172.31.0.234'
+    }
+
     stages {
         stage('Compile') {
             agent any
@@ -19,14 +23,14 @@ pipeline {
 
             
         }
-        stage('UnitTest') {
-            agent any
+        stage('UnitTest') { // running on slave2 via ssh-agent
+            agent {label 'linux_slave'}
             steps {
                 script{
-                    echo "Executing the TC"
+                    echo "RUNNING THE TC"
                     sh "mvn test"
                 }
-                
+                }
             }
             post{
                 always{
@@ -36,11 +40,14 @@ pipeline {
             
         }
         stage('Package') {
-            agent {label 'linux_slave'}
+            agent any
             steps {
                 script{
-                    echo "PAckage the code"
-                    sh "mvn package"
+                    sshagent(['slave2']) {
+                    echo "Executing the code"
+                    sh "scp  -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+                    sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh'"
+                }
                 }
                 
             }
