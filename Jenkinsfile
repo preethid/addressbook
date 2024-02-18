@@ -24,7 +24,8 @@ pipeline {
             
         }
         stage('UnitTest') { // running on slave1
-            agent {label 'linux_slave'}
+            //agent {label 'linux_slave'}
+            agent any
             steps {
                 script{
                     echo "RUNNING THE TC"
