@@ -5,7 +5,7 @@ pipeline {
          maven 'mymaven'
    }
    environment{
-       BUILD_SERVER_IP='ec2-user@13.233.147.135'
+       BUILD_SERVER_IP='ec2-user@172.31.9.109'
        IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
    }
     stages {
@@ -36,7 +36,7 @@ pipeline {
             agent any            
             steps {
                 script{
-                sshagent(['BUILD_SERVER_KEY']) {
+                sshagent(['slave2']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                 echo "Packaging the apps"
                 sh "scp -o StrictHostKeyChecking=no server-script.sh ${BUILD_SERVER_IP}:/home/ec2-user"
@@ -51,8 +51,8 @@ pipeline {
         }
        stage('Provision the server with TF'){
             environment{
-                   AWS_ACCESS_KEY_ID =credentials("jenkins_aws_access_key_id")
-                   AWS_SECRET_ACCESS_KEY=credentials("jenkins_aws_secret_access_key")
+                   AWS_ACCESS_KEY_ID =credentials("ACCESS_KEY")
+                   AWS_SECRET_ACCESS_KEY=credentials("SECRET_ACCESS_KEY")
             }
            agent any
            steps{
@@ -76,10 +76,10 @@ pipeline {
                script{
                    echo "Deployin on the instance"
                     echo "${EC2_PUBLIC_IP}"
-                     sshagent(['DEPLOY_SERVER_KEY']) {
+                     sshagent(['slave2']) {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                       sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker login -u $USERNAME -p $PASSWORD"
-                      sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}"
+                      sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8080:8080 ${IMAGE_NAME}"
                      
                 }
             }
