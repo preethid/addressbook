@@ -1,7 +1,7 @@
 pipeline {
    agent none
    tools{
-         jdk 'Myjava'
+         jdk 'myjava'
          maven 'mymaven'
    }
    environment{
