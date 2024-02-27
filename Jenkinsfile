@@ -62,6 +62,13 @@ pipeline {
         }
         stage('Deploy docker container'){
             agent any
+            input{
+                message "Please approve the deployment"
+                ok "yes, to deploy"
+                parameters{
+                    choice(name: 'APPVERSION', choices:['1.1','1.2','1.3'])
+                }
+            }
             steps{
                 script{
                     sshagent(['slave2']) {
