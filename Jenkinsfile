@@ -5,7 +5,11 @@ pipeline {
         // Install the Maven version configured as "M3" and add it to the path.
         maven "mymaven"
     }
-
+    parameters{
+        string(name:'Env',defaultValue:'Test',description:'env to deploy')
+        booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
+        choice(name:'VERSION',choices:['1.1','1.2','1.3'])
+    }
     environment{
         BUILD_SERVER='ec2-user@172.31.5.148'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
@@ -17,7 +21,7 @@ pipeline {
             agent any
             steps {
                 script{
-                    echo "Compiling the code"
+                    echo "Compiling the code ${params.Env}"
                     sh "mvn compile"
                 }
                 
@@ -28,6 +32,11 @@ pipeline {
         stage('UnitTest') { // running on slave1
             //agent {label 'linux_slave'}
             agent any
+            when{
+                expression{
+                    params.executeTests == true
+                }
+            }
             steps {
                 script{
                     echo "RUNNING THE TC"
