@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Package') {
             steps {
-               echo "Package teh code"
+               echo "Package the sad code"
             }
         }
     }
