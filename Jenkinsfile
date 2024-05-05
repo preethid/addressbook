@@ -9,17 +9,17 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-               echo "compiling teh code"
+               echo "compiling the code"
             }
         }
         stage('UnitTest') {
             steps {
-               echo "Test teh code"
+               echo "Test the code"
             }
         }
         stage('Package') {
             steps {
-               echo "Package teh code"
+               echo "Package the code"
             }
         }
     }
