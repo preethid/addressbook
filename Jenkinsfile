@@ -9,20 +9,28 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
+                script{
                echo "compiling the code"
                sh "mvn compile"
+                }
             }
         }
+            
         stage('UnitTest') {
             steps {
+                script{
                echo "Test the code"
                sh "mvn test"
+                }
             }
+        
         }
         stage('Package') {
             steps {
+                script{
                echo "Package the code"
                sh "mvn package"
+                }
             }
         }
     }
