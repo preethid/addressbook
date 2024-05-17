@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
 
     parameters{
         string(name:'Env',defaultValue:'Test',description:'version to deploy')
@@ -10,11 +10,13 @@ pipeline {
 
     stages {
         stage('Compile') {
+            agent { label 'linux_slave' }
             steps {
                 echo "Compiling Hello World in ${params.Env}"
             }
         }
         stage('UnitTest') {
+            agent any
              when {
                 expression{
                     params.executeTests == true
@@ -25,6 +27,7 @@ pipeline {
             }
         }
          stage('Package') {
+            agent { label 'linux_slave' }
             steps {
                 echo "Packaging Hello World app verisob ${params.APPVERSION}"
             }
