@@ -1,5 +1,8 @@
 pipeline {
     agent none
+    tools{
+        maven 'mymaven'
+    }
 
     parameters{
         string(name:'Env',defaultValue:'Test',description:'version to deploy')
@@ -13,6 +16,7 @@ pipeline {
             agent { label 'linux_slave' }
             steps {
                 echo "Compiling Hello World in ${params.Env}"
+                sh 'mvn compile'
             }
         }
         stage('UnitTest') {
@@ -24,12 +28,14 @@ pipeline {
              }
             steps {
                 echo 'Testing Hello World'
+                sh 'mvn test'
             }
         }
          stage('Package') {
             agent { label 'linux_slave' }
             steps {
                 echo "Packaging Hello World app verisob ${params.APPVERSION}"
+                sh 'mvn package'
             }
         }
     }
