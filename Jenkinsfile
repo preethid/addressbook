@@ -10,6 +10,9 @@ pipeline {
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
 
     }
+    environment{
+        BUILD_SERVER='ec2-user@172.31.41.81'
+    }
 
     stages {
         stage('Compile') {
@@ -37,10 +40,13 @@ pipeline {
             }
         }
          stage('Package') {
-            agent { label 'linux_slave' }
+            agent any
             steps {
-                echo "Packaging Hello World app verisob ${params.APPVERSION}"
-                sh 'mvn package'
+                sshagent(['slave2']) {
+                     echo "Packaging Hello World app verisob ${params.APPVERSION}"
+                     sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh'"
+                }
             }
         }
     }
