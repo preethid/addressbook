@@ -40,6 +40,13 @@ pipeline {
             }
         }
          stage('Package') {
+            input{
+                message "Select the version to package"
+                ok "Version selected"
+                parameters{
+                    choice(name:'NEWAPP',choices:['1.1','1.2','1.3'])
+                }
+            }
             agent any
             steps {
                 sshagent(['slave2']) {
