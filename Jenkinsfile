@@ -12,6 +12,7 @@ pipeline {
     }
     environment{
         BUILD_SERVER='ec2-user@172.31.41.81'
+        IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
     }
 
     stages {
@@ -39,7 +40,24 @@ pipeline {
                 }
             }
         }
-         stage('Package') {
+        //  stage('Package') {
+        //     input{
+        //         message "Select the version to package"
+        //         ok "Version selected"
+        //         parameters{
+        //             choice(name:'NEWAPP',choices:['1.1','1.2','1.3'])
+        //         }
+        //     }
+        //     agent any
+        //     steps {
+        //         sshagent(['slave2']) {
+        //              echo "Packaging Hello World app verisob ${params.APPVERSION}"
+        //              sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
+        //              sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh'"
+        //         }
+        //     }
+        // }
+         stage('Containerising the build phase') {ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}
             input{
                 message "Select the version to package"
                 ok "Version selected"
@@ -50,10 +68,14 @@ pipeline {
             agent any
             steps {
                 sshagent(['slave2']) {
-                     echo "Packaging Hello World app verisob ${params.APPVERSION}"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'password', usernameVariable: 'username')]) {
+                     echo "Containerising Hello World app verison ${params.APPVERSION}"
                      sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
-                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh'"
+                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
+                     sh "ssh ${BUILD_SERVER} sudo docker login -u ${username} -p ${password}"
+                     sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
+            }
             }
         }
     }
