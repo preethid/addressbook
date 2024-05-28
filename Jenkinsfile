@@ -18,7 +18,8 @@ pipeline {
 
     stages {
         stage('Compile') {
-            agent { label 'linux_slave' }
+            //agent { label 'linux_slave' }
+            agent any
             steps {
                 echo "Compiling Hello World in ${params.Env}"
                 sh 'mvn compile'
