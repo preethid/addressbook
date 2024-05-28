@@ -89,7 +89,7 @@ pipeline {
                      echo "Deploying docker container on test/deploy server"
                     //  sh "scp -o StrictHostKeyChecking=no server-config.sh ${DEPLOY_SERVER}:/home/ec2-user"
                     //  sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} 'bash server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
-                    sh "ssh ${DEPLOY_SERVER} sudo yum install docker -y"
+                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
                      sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
                      sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${username} -p ${password}"
                      sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
