@@ -11,9 +11,11 @@ pipeline {
 
     }
     environment{
-        BUILD_SERVER='ec2-user@172.31.33.133'
-        DEPLOY_SERVER='ec2-user@172.31.37.123'
+        BUILD_SERVER='ec2-user@172.31.3.147'
+        //DEPLOY_SERVER='ec2-user@172.31.37.123'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos'
+         ACCESS_KEY=credentials('ACCESS_KEY')
+        SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
     }
 
     stages {
@@ -73,6 +75,27 @@ pipeline {
             }
             }
         }
+        stage("Provision deploy server with TF"){
+            // environment{
+            //      ACCESS_KEY=credentials('ACCESS_KEY')
+            //      SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
+            // }
+             agent any
+                   steps{
+                       script{
+                           dir('terraform'){
+                            sh 'aws configure set aws_access_key_id ${ACCESS_KEY}'
+                            sh 'aws configure set aws_secret_access_key ${SECRET_ACCESS_KEY}'
+                           sh "terraform init"
+                           sh "terraform apply --auto-approve"
+                           EC2_PUBLIC_IP = sh(
+                            script: "terraform output ec2_ip",
+                            returnStdout: true
+                           ).trim()
+                       }
+                       }
+                   }
+        }
 
         stage('Deploy the docker container') {
             input{
@@ -89,10 +112,10 @@ pipeline {
                      echo "Deploying docker container on test/deploy server"
                     //  sh "scp -o StrictHostKeyChecking=no server-config.sh ${DEPLOY_SERVER}:/home/ec2-user"
                     //  sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} 'bash server-config.sh ${IMAGE_NAME} ${BUILD_NUMBER}'"
-                    sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} sudo yum install docker -y"
-                     sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
-                     sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${username} -p ${password}"
-                     sh "ssh ${DEPLOY_SERVER} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
+                     sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
+                     sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker login -u ${username} -p ${password}"
+                     sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -P ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
             }
