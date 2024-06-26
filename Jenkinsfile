@@ -1,6 +1,10 @@
 pipeline {
     agent none
 
+    tools{
+        maven 'mymaven'
+    }
+
     parameters{
          
         string(name:'Env',defaultValue:'Test',description:'version to deploy')
@@ -14,6 +18,7 @@ pipeline {
             agent any
             steps {
                 echo "Compiling the Code in ${params.Env}"
+                sh "mvn compile"
                 
             }
         }
@@ -26,6 +31,7 @@ pipeline {
             }
             steps {
                 echo 'Test the Code'
+                sh "mvn test"
             }
         }
         stage('Package') {
@@ -40,6 +46,7 @@ pipeline {
             }
             steps {
                 echo "Package the Code ${params.APPVERSION}"
+                sh "mvn package"
                 
             }
         }
