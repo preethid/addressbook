@@ -22,6 +22,14 @@ pipeline {
             }
         }
         stage('Package') {
+             input {
+                message "select the version you want to deploy"
+                ok "version selected"
+                submitter "alice,bob"
+                parameters {
+                    choice(name: 'NEWAPP', choices['1.1', '1.2', '1.3'])
+                }
+            }
             steps {
                 echo "Packaging the Code ${params.APPVERSION}"
             }
