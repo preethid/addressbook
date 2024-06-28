@@ -21,7 +21,7 @@ data "aws_ami" "myami"{
 
 resource "aws_security_group" "mywebsecurity"{
   name = "ownsecurityrules"
-  vpc_id = aws_vpc.main.id
+  //vpc_id = aws_vpc.main.id
         ingress {
     description      = "SSH"
     from_port        = 22
