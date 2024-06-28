@@ -20,23 +20,7 @@ provider "aws" {
   #   secret_key = "my-secret-key"
 }
 
-#1) create vpc
 
-resource "aws_vpc" "ownvpc"{
-  cidr_block = var.vpc_cidr_block
-  tags={
-    Name="own-vpc"
-  }
-
-}
-
-module "mysubnet" {
-  source = "./modules/subnet"
-  vpc_id = aws_vpc.ownvpc.id
-  subnet_cidr_block = var.subnet_cidr_block
-  az = var.az
-  env = var.env
-}
 
 module "webserver"{
   source = "./modules/webserver"
