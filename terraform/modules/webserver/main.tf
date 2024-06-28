@@ -21,7 +21,7 @@ data "aws_ami" "myami"{
 
 resource "aws_security_group" "mywebsecurity"{
   name = "ownsecurityrules"
-  vpc_id = var.vpc_id
+  //vpc_id = var.vpc_id
         ingress {
     description      = "SSH"
     from_port        = 22
@@ -59,7 +59,7 @@ resource "aws_instance" "web" {
   associate_public_ip_address =true
   vpc_security_group_ids = [aws_security_group.mywebsecurity.id]
 
-  subnet_id = var.subnet_id
+  //subnet_id = var.subnet_id
   key_name = "ansible"
   #user_data =file("server-script.sh")
 

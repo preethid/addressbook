@@ -24,8 +24,8 @@ provider "aws" {
 
 module "webserver"{
   source = "./modules/webserver"
-  vpc_id = aws_vpc.ownvpc.id
-  subnet_id = module.mysubnet.subnet.id
+  //vpc_id = aws_vpc.ownvpc.id
+  //subnet_id = module.mysubnet.subnet.id
   env = var.env
   instance_type = var.instance_type
 }
