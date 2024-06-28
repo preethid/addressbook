@@ -70,7 +70,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'password', usernameVariable: 'username')]) {
                      echo "Containerising Hello World app verison ${params.APPVERSION}"
                      sh "scp -o StrictHostKeyChecking=no server-config.sh ${BUILD_SERVER}:/home/ec2-user"
-                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} 'bash server-config.sh ${IMAGE_NAME}'"
+                     sh "ssh -o StrictHostKeyChecking=no ${BUILD_SERVER} bash server-config.sh ${IMAGE_NAME}"
                      sh "ssh ${BUILD_SERVER} sudo docker login -u ${username} -p ${password}"
                      sh "ssh ${BUILD_SERVER} sudo docker push ${IMAGE_NAME}"
                 }
