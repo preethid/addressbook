@@ -26,6 +26,14 @@ pipeline {
             }
         }
         stage('Package') {
+              input {
+                message "select the version to continue "
+                ok "selected the version"
+               
+                parameters {
+                    choicd(name: 'NEWAPP', choices: ['1.1','1.2','1.3'])
+                }
+            }
             steps {
                 echo "Packaging...................Packaging ${params.APPVERSION}"
             }
