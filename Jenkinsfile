@@ -1,6 +1,10 @@
 pipeline {
     agent any  // Added the top-level agent
 
+    tools{
+        maven 'mymaven'
+    }
+
     parameters {
         string(name: 'Env', defaultValue: 'Test', description: 'version to deploy')
         booleanParam(name: 'executeTests', defaultValue: true, description: 'decide to run tc')
@@ -12,7 +16,9 @@ pipeline {
             agent any
             steps {
                 echo "Compiling...................Compiling ${params.Env}"
+                sh "mvn compile"
             }
+           
         }
         stage('UnitTest') {
             agent any
@@ -23,6 +29,7 @@ pipeline {
             }
             steps {
                 echo 'testing...................testing'
+                sh "mvn test"
             }
         }
         stage('Package') {
@@ -38,6 +45,7 @@ pipeline {
             }
             steps {
                 echo "Packaging...................Packaging ${params.APPVERSION}"
+                sh "mvn package"
             }
         }
     }
