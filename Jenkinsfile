@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    
        parameters {
             string(name: 'Env', defaultValue: 'Test', description: 'version to deploy')
 
@@ -12,11 +12,13 @@ pipeline {
     stages {
      
         stage('compile') {
+            agent any
             steps {
                 echo "Compiling...................Compiling ${params.Env}"
             }
         }
         stage('UnitTest') {
+            agent any
             when{
                 expression{
                     params.executeTests == true
@@ -27,6 +29,9 @@ pipeline {
             }
         }
         stage('Package') {
+            agent {
+                label 'linux_slave'
+            }
               input {
                 message "select the version to continue "
                 ok "selected the version"
