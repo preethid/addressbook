@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.edurekademo.tutorial</groupId>
+    <groupId>com.sample.tutorial</groupId>
     <artifactId>addressbook</artifactId>
     <packaging>war</packaging>
-    <version>2.0</version>
+    <version>3.0</version>
     <name>Vaadin Addressbook example</name>
 
     <properties>
@@ -491,5 +491,12 @@
             </reporting>
         </profile>
     </profiles>
+    <distributionManagement>
+    <repository>
+        <id>central</id>
+        <name>68debbc1a703-releases</name>
+        <url>http://localhost:8082/artifactory/mymavenrepo-libs-release</url>
+    </repository>
+</distributionManagement>
 
 </project>
