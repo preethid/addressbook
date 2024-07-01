@@ -10,9 +10,10 @@ pipeline {
     }
 
     parameters {
-        string(name: 'Env', defaultValue: 'Test', description: 'version to deploy')
-        booleanParam(name: 'executeTests', defaultValue: true, description: 'decide to run tc')
+        string(name: 'Env', defaultValue: 'Test', description: 'Version to deploy')
+        booleanParam(name: 'executeTests', defaultValue: true, description: 'Decide whether to run tests')
         choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'])
+        choice(name: 'NEWAPP', choices: ['1.1', '1.2', '1.3'])
     }
 
     stages {
@@ -36,7 +37,6 @@ pipeline {
                         echo 'testing...................testing'
                         sh "mvn test"
                         sh "scp -o StrictHostKeyChecking=no server-script.sh ec2-user@${env.SERVER_IP}:/home/ec2-user"
-                        // Adding logging to verify file presence and permissions
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.SERVER_IP} 'ls -l /home/ec2-user/server-script.sh && chmod +x /home/ec2-user/server-script.sh && bash /home/ec2-user/server-script.sh'"
                     }
                 }
@@ -51,16 +51,13 @@ pipeline {
             agent {
                 label 'linux_slave'
             }
-            input {
-                message "select the version to continue"
-                ok "selected the version"
-                parameters {
-                    choice(name: 'NEWAPP', choices: ['1.1', '1.2', '1.3'])
-                }
-            }
             steps {
                 echo "Packaging...................Packaging ${params.APPVERSION}"
                 sh "mvn package"
+                input(message: "Select the version to continue", ok: "Selected the version") {
+                    echo "Continuing with version ${params.NEWAPP}"
+                    // Additional steps or actions based on the chosen version
+                }
             }
         }
     }
