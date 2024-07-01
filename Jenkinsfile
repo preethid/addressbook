@@ -1,8 +1,12 @@
 pipeline {
     agent any  // Added the top-level agent
 
-    tools{
+    tools {
         maven 'mymaven'
+    }
+
+    environment {
+        SERVER_IP = '172.31.40.77' // Define the environment variable for the IP address
     }
 
     parameters {
@@ -18,7 +22,6 @@ pipeline {
                 echo "Compiling...................Compiling ${params.Env}"
                 sh "mvn compile"
             }
-           
         }
         stage('UnitTest') {
             agent any
@@ -28,12 +31,18 @@ pipeline {
                 }
             }
             steps {
-                echo 'testing...................testing'
-                sh "mvn test"
+                script {
+                    sshagent(['slave2']) {
+                        echo 'testing...................testing'
+                        sh "mvn test"
+                        sh "scp -o StrictHostKeyChecking=no sserver-script.sh ec2-user@${env.SERVER_IP}:/home/ec2-user"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.SERVER_IP} 'bash /home/ec2-user/server-script.sh'"
+                    }
+                }
             }
-            post{
-                always{
-                    junit 'target/surefire-reports/*xml'
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml' // Fixed the path to XML reports
                 }
             }
         }
