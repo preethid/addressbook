@@ -11,7 +11,7 @@ then
    cd addressbook
    git pull origin devops-1/july
 else
-   git clone https://github.com/preethid/addressbook.git
+   git clone https://github.com/rajavelugithub/addressbook.git
    cd addressbook
 fi
 

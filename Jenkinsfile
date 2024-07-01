@@ -13,7 +13,7 @@ pipeline {
     
     }
     environment{
-        DEV_SERVER='ec2-user@172.31.39.193'
+        DEV_SERVER='ec2-user@172.31.40.77'
     }
 
     stages {
