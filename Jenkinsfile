@@ -36,7 +36,8 @@ pipeline {
                         echo 'testing...................testing'
                         sh "mvn test"
                         sh "scp -o StrictHostKeyChecking=no server-script.sh ec2-user@${env.SERVER_IP}:/home/ec2-user"
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.SERVER_IP} 'bash /home/ec2-user/server-script.sh'"
+                        // Adding logging to verify file presence and permissions
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.SERVER_IP} 'ls -l /home/ec2-user/server-script.sh && chmod +x /home/ec2-user/server-script.sh && bash /home/ec2-user/server-script.sh'"
                     }
                 }
             }
