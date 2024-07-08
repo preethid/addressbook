@@ -34,17 +34,18 @@ pipeline {
                 }
             }
             steps {
-                script{
+              
                 echo 'Test the Code'
-                mvn test
+                sh "mvn test"
             }
-            }
+            
             post{
                 always{
                     junit 'target/surefire-reports/*.xml'
                 }
             }
         }
+        
         stage('Dockerize and push the image') {
             agent any
             input{
@@ -61,7 +62,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                 echo "Package the Code ${params.APPVERSION}"
                  sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER}:/home/ec2-user"
-               sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} bash ~/server-script.sh ${IMAGE_NAME}"
+               sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} bash /home/ec2-user/server-script.sh ${IMAGE_NAME}"
                sh "ssh ${DEV_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
                sh "ssh ${DEV_SERVER} sudo docker push ${IMAGE_NAME}"
                     }
