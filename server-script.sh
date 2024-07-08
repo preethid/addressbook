@@ -14,8 +14,8 @@ then
    git pull origin feature/cicd-docker
 else
    git clone https://github.com/preethid/addressbook.git
-   git checkout feature/cicd-docker
-   cd addressbook
+     cd addressbook
+      git checkout feature/cicd-docker
 fi
 
 docker build -t $1 .
