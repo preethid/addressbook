@@ -15,7 +15,7 @@ then
 else
    git clone https://github.com/preethid/addressbook.git
      cd addressbook
-      git checkout feature/cicd-docker
+   git checkout feature/cicd-docker
 fi
 
-docker build -t $1 .
+sudo docker build -t $1 .
