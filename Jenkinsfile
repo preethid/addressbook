@@ -58,7 +58,7 @@ pipeline {
             steps {
                  script{
                 sshagent(['slave2']) {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASWORD', usernameVariable: 'USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                 echo "Package the Code ${params.APPVERSION}"
                  sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER}:/home/ec2-user"
                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} bash ~/server-script.sh ${IMAGE_NAME}"
