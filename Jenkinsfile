@@ -78,16 +78,16 @@ pipeline {
             }
         }
         stage("Provision deploy server with TF"){
-            environment{
-                 ACCESS_KEY=credentials('ACCESS_KEY')
-                 SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
-            }
+            // environment{
+            //      ACCESS_KEY=credentials('ACCESS_KEY')
+            //      SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
+            // }
              agent any
                    steps{
                        script{
                            dir('terraform'){
-                            // sh 'aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}'
-                            // sh 'aws configure set aws_secret_access_key ${SECRET_ACCESS_KEY}'
+                            sh 'aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}'
+                            sh 'aws configure set aws_secret_access_key ${SECRET_ACCESS_KEY}'
                            sh "terraform init"
                            sh "terraform apply --auto-approve"
                            EC2_PUBLIC_IP = sh(
