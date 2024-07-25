@@ -113,7 +113,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'password', usernameVariable: 'username')]) {
                      echo "Deploying docker container on test/deploy server"
                      // sh "scp -o StrictHostKeyChecking=no server-config.sh ec2-user@${EC2_PUBLIC_IP}:/home/ec2-user"
-                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} 'sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}'"
+                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo docker run -itd -p 8001:8080 ${IMAGE_NAME}"
                     //sh "scp -o StrictHostKeyChecking=no ansible/* ${ACM_IP}:/home/ec2-user"
                     //copy the ansible target key on ACM as private key file
                    // withCredentials([sshUserPrivateKey(credentialsId: 'Ansible_target',keyFileVariable: 'keyfile',usernameVariable: 'user')]){ 
