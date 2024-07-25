@@ -14,8 +14,8 @@ pipeline {
         BUILD_SERVER='ec2-user@172.31.8.206'
         //DEPLOY_SERVER='ec2-user@172.31.37.123'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
-       // AWS_ACCESS_KEY_ID=credentials('ACCESS_KEY')
-       // AWS_SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
+       AWS_ACCESS_KEY_ID=credentials('ACCESS_KEY')
+       AWS_SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
         //DOCKER_REG_PASSWORD=credentials("DOCKER_REG_PASSWORD")
        // ACM_IP='ec2-user@172.31.15.157'
     }
@@ -78,10 +78,10 @@ pipeline {
             }
         }
         stage("Provision deploy server with TF"){
-            // environment{
-            //      ACCESS_KEY=credentials('ACCESS_KEY')
-            //      SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
-            // }
+            environment{
+                 ACCESS_KEY=credentials('ACCESS_KEY')
+                 SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
+            }
              agent any
                    steps{
                        script{
