@@ -11,7 +11,7 @@ pipeline {
 
     }
     environment{
-        BUILD_SERVER='ec2-user@172.31.8.122'
+        BUILD_SERVER='ec2-user@172.31.8.206'
         //DEPLOY_SERVER='ec2-user@172.31.37.123'
         IMAGE_NAME='devopstrainer/java-mvn-privaterepos:$BUILD_NUMBER'
        // AWS_ACCESS_KEY_ID=credentials('ACCESS_KEY')
