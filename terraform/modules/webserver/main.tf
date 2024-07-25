@@ -32,8 +32,8 @@ resource "aws_security_group" "mywebsecurity"{
 
     ingress {
     description      = "SSH"
-    from_port        = 8080
-    to_port          = 8080
+    from_port        = 8001
+    to_port          = 8001
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
      }
@@ -61,7 +61,7 @@ resource "aws_instance" "web" {
 
   //subnet_id = var.subnet_id
   key_name = "aws"
-  #user_data =file("server-script.sh")
+  user_data =file("server-script.sh")
 
   tags = {
     Name = "${terraform.workspace}-tf"
