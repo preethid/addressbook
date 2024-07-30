@@ -60,7 +60,7 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = [aws_security_group.mywebsecurity.id]
 
   //subnet_id = var.subnet_id
-  key_name = "aws"
+  key_name = "ansible"
   user_data =file("server-script.sh")
 
   tags = {
