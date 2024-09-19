@@ -1,19 +1,22 @@
 pipeline {
    agent any
+   tools{
+    jdk "myjava"
+   }
     stages {
-        stage('Compile') {
+        stage('Compile') { //prod
             steps {
                 echo "Compile the code"
                 sh "mvn compile"
             }
         }
-         stage('UnitTest') {
+         stage('UnitTest') { //test
             steps {
                 echo "Test the code"
                 sh "mvn test"
             }
         }
-         stage('Package') {
+         stage('Package') {//dev
             steps {
                 echo "Package the code"
                 sh "mvn package"
