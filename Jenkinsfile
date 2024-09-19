@@ -1,8 +1,8 @@
 pipeline {
    agent none
-   tools{
-    jdk "myjava"
-   }
+//    tools{
+//     jdk "myjava"
+//    }
     stages {
         stage('Compile') { //prod
         agent any
