@@ -21,6 +21,11 @@ pipeline {
         }
          stage('Package') {//dev
         agent any
+             when{
+            expression{
+                BRANCH_NAME == 'b1'
+            }
+        }
             steps {
                 echo "Package the code"
                 sh "mvn package"
