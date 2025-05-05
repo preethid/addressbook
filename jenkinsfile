@@ -1,0 +1,55 @@
+pipeline {
+    agent none
+
+    parameters {
+        string(name: 'env', defaultValue: 'test', description: 'Environment to compile')
+        booleanParam(name: 'executiontests', defaultValue: true, description: 'Decide whether to run tests')
+        choice(name: 'APPVERSION', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+    }
+
+    stages {
+        stage('Compile') {
+        agent any
+            steps {
+                echo "Compiling Hello World"
+                echo "Compiling in environment: ${params.env}"
+                sh "mvn compile"
+            }
+        }
+
+        stage('Test') {
+        agent any
+            when {
+                expression { return params.executiontests }
+            }
+            steps {
+                echo "Testing Hello World"
+                sh "mvn test"
+            }
+        }
+
+        stage('Package') {
+        agent {label 'roshan_slave'} 
+            steps {
+                echo "Packaging Hello World"
+                sh "mvn package"
+            }
+        }
+
+        stage('Deploy') {
+        agent any
+            steps {
+                script {
+                    def userInput = input(
+                        message: 'Select the version to deploy',
+                        ok: 'Deploy',
+                        parameters: [
+                            choice(name: 'NEWVERSION', choices: ['1', '2', '3'], description: 'Choose deployment version')
+                        ]
+                    )
+                    echo "Deploying version: ${userInput}"
+                }
+            }
+        }
+    }
+}
